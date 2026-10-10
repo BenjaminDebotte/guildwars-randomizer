@@ -43,8 +43,8 @@ A high-performance, client-side web application for generating randomized Guild 
 
 ```bash
 # Clone the repository
-git clone https://github.com/benjaminwitt/gw1-randomizer.git
-cd gw1-randomizer
+git clone https://github.com/BenjaminDebotte/guildwars-randomizer.git
+cd guildwars-randomizer
 
 # Install dependencies
 npm install
