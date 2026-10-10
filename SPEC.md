@@ -123,9 +123,9 @@ The bitstream is interpreted in **lowest-bit-first** order, encoded in RFC 4648 
 
 ```typescript
 export interface TemplateData {
-  primaryProfession: ProfessionId;
-  secondaryProfession: ProfessionId;
-  attributes: Array<{ attributeId: AttributeId; rank: number }>;
+  primaryProfession: Profession;
+  secondaryProfession: Profession;
+  attributes: Array<{ attributeId: Attribute; rank: number }>;
   skills: [number, number, number, number, number, number, number, number];
 }
 ```
@@ -137,9 +137,9 @@ export interface TemplateData {
 export interface Gw1Skill {
   id: number;
   name: string;
-  profession: ProfessionId;
-  attribute: AttributeId | null; // null for Common/Signets
-  campaign: CampaignId;
+  profession: Profession;
+  attribute: Attribute | null; // null for Common/Signets
+  campaign: Campaign;
   isElite: boolean;
   isPvEOnly: boolean;
   type: SkillType;
