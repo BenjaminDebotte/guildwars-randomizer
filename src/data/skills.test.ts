@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { SKILLS, SKILL_BY_ID, getSkillById, getAvailableSkills } from './skills';
+import { SKILLS, SKILL_BY_ID, getSkillById, getAvailableSkills, resolveTemplateSkills } from './skills';
 
 describe('Skill Database Integrity', () => {
   it('loads valid canonical skill records with unique IDs', () => {
@@ -127,5 +127,25 @@ describe('Skill Database Integrity', () => {
 
     const etherNightmareKurzick = getSkillById(2092);
     expect(etherNightmareKurzick?.titleTrack).toBe('kurzick');
+  });
+
+  it('resolves template skill IDs with fallback objects for empty or unknown skills', () => {
+    // 1 is Healing Signet, 0 is empty slot, 999999 is unknown
+    const resolved = resolveTemplateSkills([1, 0, 999999]);
+    expect(resolved.length).toBe(3);
+
+    // Known skill
+    expect(resolved[0].id).toBe(1);
+    expect(resolved[0].name).toBe('Healing Signet');
+
+    // Empty slot
+    expect(resolved[1].id).toBe(0);
+    expect(resolved[1].name).toBe('Empty Slot');
+    expect(resolved[1].profession).toBe(0);
+
+    // Unknown skill
+    expect(resolved[2].id).toBe(999999);
+    expect(resolved[2].name).toBe('Unknown Skill (999999)');
+    expect(resolved[2].profession).toBe(0);
   });
 });

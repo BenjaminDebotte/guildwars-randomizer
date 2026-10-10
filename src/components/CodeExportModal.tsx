@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Copy, Check, ArrowDownToLine, X, AlertCircle, Link } from 'lucide-react';
 import { decodeSkillTemplate } from '../core/codec/templateCodec';
-import { getSkillById } from '../data/skills';
-import { TemplateData, Gw1Skill, Profession, Campaign } from '../data/types';
+import { resolveTemplateSkills } from '../data/skills';
+import { TemplateData, Gw1Skill } from '../data/types';
 
 interface CodeExportModalProps {
   isOpen: boolean;
@@ -66,35 +66,13 @@ export function CodeExportModal({
 
     try {
       const decoded = decodeSkillTemplate(importInput.trim());
-
-      // Resolve skills
-      const resolvedSkills: Gw1Skill[] = [];
-      for (const skillId of decoded.skills) {
-        const skill = getSkillById(skillId);
-        if (skill) {
-          resolvedSkills.push(skill);
-        } else {
-          // Unknown or empty skill fallback
-          resolvedSkills.push({
-            id: skillId,
-            name: skillId === 0 ? 'Empty Slot' : `Unknown Skill (${skillId})`,
-            profession: Profession.None,
-            attribute: null,
-            campaign: Campaign.Core,
-            isElite: false,
-            isPvEOnly: false,
-            type: 'Skill',
-            energy: 0,
-            activation: 0,
-            recharge: 0,
-            description: '',
-          });
-        }
-      }
+      const resolvedSkills = resolveTemplateSkills(decoded.skills) as [
+        Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill
+      ];
 
       onImportBuild({
         templateData: decoded,
-        skills: resolvedSkills as [Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill],
+        skills: resolvedSkills,
       });
 
       setImportInput('');

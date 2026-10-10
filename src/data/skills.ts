@@ -1,5 +1,5 @@
 import rawSkills from './skills.json';
-import { Gw1Skill, Profession } from './types';
+import { Campaign, Gw1Skill, Profession } from './types';
 
 export const SKILLS: Gw1Skill[] = rawSkills as Gw1Skill[];
 
@@ -9,6 +9,27 @@ export const SKILL_BY_ID = new Map<number, Gw1Skill>(
 
 export function getSkillById(id: number): Gw1Skill | undefined {
   return SKILL_BY_ID.get(id);
+}
+
+export function createFallbackSkill(id: number): Gw1Skill {
+  return {
+    id,
+    name: id === 0 ? 'Empty Slot' : `Unknown Skill (${id})`,
+    profession: Profession.None,
+    attribute: null,
+    campaign: Campaign.Core,
+    isElite: false,
+    isPvEOnly: false,
+    type: 'Skill',
+    energy: 0,
+    activation: 0,
+    recharge: 0,
+    description: '',
+  };
+}
+
+export function resolveTemplateSkills(skillIds: number[]): Gw1Skill[] {
+  return skillIds.map(id => getSkillById(id) ?? createFallbackSkill(id));
 }
 
 export function getAvailableSkills(options: {

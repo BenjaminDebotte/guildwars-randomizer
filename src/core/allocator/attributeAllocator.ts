@@ -55,18 +55,15 @@ export function allocateAttributePoints(options: AllocateOptions): AllocationRes
   const attributeCounts = new Map<Attribute, number>();
 
   for (const skill of skills) {
-    if (skill.attribute === null || skill.attribute === undefined) continue;
     const attrId = skill.attribute;
+    if (attrId == null || !ATTRIBUTES[attrId]) continue;
 
     // Hard engine rule: secondary profession's primary attribute cannot receive points
     if (attrId === secondaryPrimaryAttrId && secondaryProfession !== primaryProfession) {
       continue;
     }
 
-    // Must be a valid profession attribute
-    if (ATTRIBUTES[attrId]) {
-      attributeCounts.set(attrId, (attributeCounts.get(attrId) || 0) + 1);
-    }
+    attributeCounts.set(attrId, (attributeCounts.get(attrId) ?? 0) + 1);
   }
 
   // 2. Select attributes that will receive investment
@@ -122,33 +119,21 @@ export function allocateAttributePoints(options: AllocateOptions): AllocationRes
       remainingBudget -= 6;
     }
   } else if (activeAttrIds.length === 3 && attr1 !== undefined && attr2 !== undefined && attr3 !== undefined) {
-    // Choose between 12/10/8 (195 pts) and 12/9/9 (193 pts)
-    if (count1 >= 4 && count2 >= 2 && count3 <= 1) {
-      // 12 / 10 / 8 spread: 97 + 61 + 37 = 195 pts (leaves 5 pts)
-      ranks.set(attr1, 12);
-      ranks.set(attr2, 10);
-      ranks.set(attr3, 8);
-      remainingBudget -= 195;
+    // Choose between 12/10/8 (195 pts, leaves 5 pts) and 12/9/9 (193 pts, leaves 7 pts)
+    const isDominant = count1 >= 4 && count2 >= 2 && count3 <= 1;
+    const [r2, r3, cost, residualRank, residualCost] = isDominant
+      ? [10, 8, 195, 2, 3]
+      : [9, 9, 193, 3, 6];
 
-      // Residual 5 points: can afford rank 2 (3 pts) on 4th attribute if available
-      const attr4 = activeAttrIds[3] ?? (primaryAttributeId && !ranks.has(primaryAttributeId) ? primaryAttributeId : undefined);
-      if (attr4 && remainingBudget >= 3) {
-        ranks.set(attr4, 2);
-        remainingBudget -= 3;
-      }
-    } else {
-      // 12 / 9 / 9 spread: 97 + 48 + 48 = 193 pts (leaves 7 pts)
-      ranks.set(attr1, 12);
-      ranks.set(attr2, 9);
-      ranks.set(attr3, 9);
-      remainingBudget -= 193;
+    ranks.set(attr1, 12);
+    ranks.set(attr2, r2);
+    ranks.set(attr3, r3);
+    remainingBudget -= cost;
 
-      // Residual 7 points: can afford rank 3 (6 pts) on 4th attribute if available
-      const attr4 = activeAttrIds[3] ?? (primaryAttributeId && !ranks.has(primaryAttributeId) ? primaryAttributeId : undefined);
-      if (attr4 && remainingBudget >= 6) {
-        ranks.set(attr4, 3);
-        remainingBudget -= 6;
-      }
+    const attr4 = activeAttrIds[3] ?? (primaryAttributeId && !ranks.has(primaryAttributeId) ? primaryAttributeId : undefined);
+    if (attr4 && remainingBudget >= residualCost) {
+      ranks.set(attr4, residualRank);
+      remainingBudget -= residualCost;
     }
   } else {
     // General greedy fallback for 1 or 4+ attributes

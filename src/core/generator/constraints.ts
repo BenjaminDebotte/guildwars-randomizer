@@ -48,6 +48,13 @@ export const CHAOS_SANITY_CONFIG: SanityConfig = {
 
 const TWO_HANDED_WEAPONS: Set<WeaponRequirement> = new Set(['Hammer', 'Scythe', 'Bow', 'Staff', 'Dagger']);
 
+function countTypeSkills(skills: Gw1Skill[], type: string): number {
+  if (type === 'Form') {
+    return skills.filter(s => s.isForm || s.type === 'Form').length;
+  }
+  return skills.filter(s => s.type === type).length;
+}
+
 /**
  * Checks if a candidate skill can be legally and constructively added to the current bar.
  */
@@ -93,47 +100,34 @@ export function canAddSkill(
   }
 
   // 6. Caps on Overwriting Mechanics
-  if (candidate.type === 'Stance') {
-    const stances = currentSkills.filter(s => s.type === 'Stance').length;
-    if (stances >= (config.maxStances ?? 2)) return false;
-  }
-
-  if (candidate.type === 'Preparation') {
-    const preps = currentSkills.filter(s => s.type === 'Preparation').length;
-    if (preps >= (config.maxPreparations ?? 1)) return false;
-  }
-
-  if (candidate.isForm || candidate.type === 'Form') {
-    const forms = currentSkills.filter(s => s.isForm || s.type === 'Form').length;
-    if (forms >= (config.maxForms ?? 1)) return false;
-  }
-
-  if (candidate.type === 'WeaponSpell') {
-    const wSpells = currentSkills.filter(s => s.type === 'WeaponSpell').length;
-    if (wSpells >= (config.maxWeaponSpells ?? 2)) return false;
+  const typeLimits: Array<[boolean, number, string]> = [
+    [candidate.type === 'Stance', config.maxStances ?? 2, 'Stance'],
+    [candidate.type === 'Preparation', config.maxPreparations ?? 1, 'Preparation'],
+    [Boolean(candidate.isForm || candidate.type === 'Form'), config.maxForms ?? 1, 'Form'],
+    [candidate.type === 'WeaponSpell', config.maxWeaponSpells ?? 2, 'WeaponSpell'],
+  ];
+  for (const [matches, limit, typeName] of typeLimits) {
+    if (matches && countTypeSkills(currentSkills, typeName) >= limit) {
+      return false;
+    }
   }
 
   // 7. Weapon Coherence
   if (config.enforceWeaponCoherence) {
-    const existingWeapons = Array.from(
-      new Set(currentSkills.map(s => s.weaponRequirement).filter(Boolean))
-    ) as WeaponRequirement[];
-
-    // If candidate has a specific weapon requirement
     if (candidate.weaponRequirement) {
-      if (existingWeapons.length > 0 && !existingWeapons.includes(candidate.weaponRequirement)) {
+      if (currentSkills.some(s => s.weaponRequirement && s.weaponRequirement !== candidate.weaponRequirement)) {
         return false;
       }
-      if (TWO_HANDED_WEAPONS.has(candidate.weaponRequirement)) {
-        if (currentSkills.some(s => s.isShieldSkill)) return false;
+      if (TWO_HANDED_WEAPONS.has(candidate.weaponRequirement) && currentSkills.some(s => s.isShieldSkill)) {
+        return false;
       }
     }
 
-    // If candidate requires a shield
-    if (candidate.isShieldSkill) {
-      if (existingWeapons.some(w => TWO_HANDED_WEAPONS.has(w))) {
-        return false;
-      }
+    if (
+      candidate.isShieldSkill &&
+      currentSkills.some(s => s.weaponRequirement && TWO_HANDED_WEAPONS.has(s.weaponRequirement))
+    ) {
+      return false;
     }
   }
 
@@ -277,25 +271,18 @@ export function validateSkillBar(
     }
   }
 
-  // Stances, preparations, forms
-  const stances = skills.filter(s => s.type === 'Stance').length;
-  if (stances > (config.maxStances ?? 2)) {
-    errors.push(`Maximum ${config.maxStances ?? 2} stances exceeded (found ${stances}).`);
-  }
-
-  const preps = skills.filter(s => s.type === 'Preparation').length;
-  if (preps > (config.maxPreparations ?? 1)) {
-    errors.push(`Maximum ${config.maxPreparations ?? 1} preparations exceeded (found ${preps}).`);
-  }
-
-  const forms = skills.filter(s => s.isForm || s.type === 'Form').length;
-  if (forms > (config.maxForms ?? 1)) {
-    errors.push(`Maximum ${config.maxForms ?? 1} transformation forms exceeded (found ${forms}).`);
-  }
-
-  const weaponSpells = skills.filter(s => s.type === 'WeaponSpell').length;
-  if (weaponSpells > (config.maxWeaponSpells ?? 2)) {
-    errors.push(`Maximum ${config.maxWeaponSpells ?? 2} weapon spells exceeded (found ${weaponSpells}).`);
+  // Stances, preparations, forms, weapon spells
+  const mechanicsCaps: Array<[string, number, string]> = [
+    ['Stance', config.maxStances ?? 2, 'stances'],
+    ['Preparation', config.maxPreparations ?? 1, 'preparations'],
+    ['Form', config.maxForms ?? 1, 'transformation forms'],
+    ['WeaponSpell', config.maxWeaponSpells ?? 2, 'weapon spells'],
+  ];
+  for (const [typeName, limit, label] of mechanicsCaps) {
+    const count = countTypeSkills(skills, typeName);
+    if (count > limit) {
+      errors.push(`Maximum ${limit} ${label} exceeded (found ${count}).`);
+    }
   }
 
   // Secondary primary attribute check

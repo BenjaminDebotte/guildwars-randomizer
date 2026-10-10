@@ -32,27 +32,24 @@ export function generateBuild(options: RandomizerOptions = {}): GeneratedBuild {
   };
 
   // 1. Resolve Primary Profession
-  let primaryProf: Profession;
-  if (options.primaryProfession && options.primaryProfession !== 'random') {
-    primaryProf = options.primaryProfession;
-  } else {
-    primaryProf = pickRandom(PLAYABLE_PROFESSION_IDS);
-  }
+  const primaryProf =
+    options.primaryProfession && options.primaryProfession !== 'random'
+      ? options.primaryProfession
+      : pickRandom(PLAYABLE_PROFESSION_IDS);
 
   // 2. Resolve Secondary Profession
   let secProf: Profession;
   if (options.secondaryProfession === 'none' || options.secondaryProfession === Profession.None) {
     secProf = Profession.None;
   } else if (
-    options.secondaryProfession !== undefined &&
+    options.secondaryProfession &&
     options.secondaryProfession !== 'random' &&
     options.secondaryProfession !== primaryProf
   ) {
     secProf = options.secondaryProfession;
   } else {
-    // Pick random secondary from remaining professions, or occasionally 0 (mono-prof)
-    const validSecondaries = PLAYABLE_PROFESSION_IDS.filter(id => id !== primaryProf);
-    secProf = pickRandom(validSecondaries);
+    // Pick random secondary from remaining professions
+    secProf = pickRandom(PLAYABLE_PROFESSION_IDS.filter(id => id !== primaryProf));
   }
 
   // 3. Obtain skill pool
@@ -145,27 +142,22 @@ export function generateBuild(options: RandomizerOptions = {}): GeneratedBuild {
       const needsEnchantment = currentBar.some(s => s.isTeardown) &&
         !currentBar.some(s => s.isFlashEnchantment || s.type === 'Enchantment');
 
-      let picked: Gw1Skill;
+      let priorityCandidate: Gw1Skill | undefined;
 
       if (needsPetEnabler) {
-        const enablerCandidate = candidates.find(c => c.isPetEnabler);
-        picked = enablerCandidate ?? pickRandom(candidates);
+        priorityCandidate = candidates.find(c => c.isPetEnabler);
       } else if (needsOffhand) {
-        const offhandCandidate = candidates.find(c => c.comboChainStep === 'Offhand');
-        picked = offhandCandidate ?? pickRandom(candidates);
+        priorityCandidate = candidates.find(c => c.comboChainStep === 'Offhand');
       } else if (needsLead) {
-        const leadCandidate = candidates.find(c => c.comboChainStep === 'Lead');
-        picked = leadCandidate ?? pickRandom(candidates);
+        priorityCandidate = candidates.find(c => c.comboChainStep === 'Lead');
       } else if (needsEnchantment) {
-        const enchCandidate = candidates.find(c => c.isFlashEnchantment || c.type === 'Enchantment');
-        picked = enchCandidate ?? pickRandom(candidates);
+        priorityCandidate = candidates.find(c => c.isFlashEnchantment || c.type === 'Enchantment');
       } else if (!hasElite && options.lockedEliteId !== 'none' && remainingSlots <= 2) {
         // Encourage picking an elite before running out of slots
-        const eliteCandidate = candidates.find(c => c.isElite);
-        picked = eliteCandidate ?? pickRandom(candidates);
-      } else {
-        picked = pickRandom(candidates);
+        priorityCandidate = candidates.find(c => c.isElite);
       }
+
+      const picked = priorityCandidate ?? pickRandom(candidates);
 
       currentBar.push(picked);
     }
@@ -198,15 +190,8 @@ export function generateBuild(options: RandomizerOptions = {}): GeneratedBuild {
   }
 
   // Arrange into slots respecting locked positions
-  const finalTuple: [Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill] = [
-    finalSkills[0] as Gw1Skill,
-    finalSkills[1] as Gw1Skill,
-    finalSkills[2] as Gw1Skill,
-    finalSkills[3] as Gw1Skill,
-    finalSkills[4] as Gw1Skill,
-    finalSkills[5] as Gw1Skill,
-    finalSkills[6] as Gw1Skill,
-    finalSkills[7] as Gw1Skill,
+  const finalTuple = finalSkills.slice(0, 8) as [
+    Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill
   ];
 
   // If specific slots were locked, ensure those skills stay in their locked slot index
@@ -234,15 +219,8 @@ export function generateBuild(options: RandomizerOptions = {}): GeneratedBuild {
   });
 
   // 7. Format Template Data & Encode
-  const skillIds: [number, number, number, number, number, number, number, number] = [
-    finalTuple[0].id,
-    finalTuple[1].id,
-    finalTuple[2].id,
-    finalTuple[3].id,
-    finalTuple[4].id,
-    finalTuple[5].id,
-    finalTuple[6].id,
-    finalTuple[7].id,
+  const skillIds = finalTuple.map(s => s.id) as [
+    number, number, number, number, number, number, number, number
   ];
 
   const templateData: TemplateData = {

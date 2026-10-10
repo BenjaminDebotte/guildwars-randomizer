@@ -6,11 +6,19 @@ import { GeneratedBuild } from './core/generator/types';
 import { SanityConfig, DEFAULT_SANITY_CONFIG, CHAOS_SANITY_CONFIG } from './core/generator/constraints';
 import { encodeSkillTemplate, decodeSkillTemplate } from './core/codec/templateCodec';
 import { getCumulativeCost, MAX_ATTRIBUTE_POINTS } from './data/attributes';
-import { getSkillById } from './data/skills';
+import { resolveTemplateSkills } from './data/skills';
 import { SkillBar } from './components/SkillBar';
 import { AttributePanel } from './components/AttributePanel';
 import { FilterPanel, SanityPreset } from './components/FilterPanel';
 import { CodeExportModal } from './components/CodeExportModal';
+
+const DEFAULT_CAMPAIGNS: Campaign[] = [
+  Campaign.Core,
+  Campaign.Prophecies,
+  Campaign.Factions,
+  Campaign.Nightfall,
+  Campaign.EyeOfTheNorth,
+];
 
 function parseTemplateFromUrl(): string | null {
   if (typeof window === 'undefined') return null;
@@ -25,49 +33,36 @@ function parseTemplateFromUrl(): string | null {
   return null;
 }
 
+function createBuildFromTemplate(
+  templateData: TemplateData,
+  skills: [Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill]
+): GeneratedBuild {
+  const attributeAllocations = templateData.attributes.map(a => ({
+    attributeId: a.attributeId,
+    rank: a.rank,
+    cost: getCumulativeCost(a.rank),
+  }));
+  const totalPointsUsed = attributeAllocations.reduce((sum, a) => sum + a.cost, 0);
+
+  return {
+    primaryProfession: templateData.primaryProfession,
+    secondaryProfession: templateData.secondaryProfession,
+    skills,
+    attributeAllocations,
+    totalPointsUsed,
+    remainingPoints: MAX_ATTRIBUTE_POINTS - totalPointsUsed,
+    templateData,
+    templateCode: encodeSkillTemplate(templateData),
+  };
+}
+
 function buildFromTemplateCode(code: string): GeneratedBuild | null {
   try {
     const decoded = decodeSkillTemplate(code);
-    const resolvedSkills: Gw1Skill[] = [];
-    for (const skillId of decoded.skills) {
-      const skill = getSkillById(skillId);
-      if (skill) {
-        resolvedSkills.push(skill);
-      } else {
-        resolvedSkills.push({
-          id: skillId,
-          name: skillId === 0 ? 'Empty Slot' : `Unknown Skill (${skillId})`,
-          profession: Profession.None,
-          attribute: null,
-          campaign: Campaign.Core,
-          isElite: false,
-          isPvEOnly: false,
-          type: 'Skill',
-          energy: 0,
-          activation: 0,
-          recharge: 0,
-          description: '',
-        });
-      }
-    }
-
-    const attributeAllocations = decoded.attributes.map(a => ({
-      attributeId: a.attributeId,
-      rank: a.rank,
-      cost: getCumulativeCost(a.rank),
-    }));
-    const totalUsed = attributeAllocations.reduce((sum, a) => sum + a.cost, 0);
-
-    return {
-      primaryProfession: decoded.primaryProfession,
-      secondaryProfession: decoded.secondaryProfession,
-      skills: resolvedSkills as [Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill],
-      attributeAllocations,
-      totalPointsUsed: totalUsed,
-      remainingPoints: MAX_ATTRIBUTE_POINTS - totalUsed,
-      templateData: decoded,
-      templateCode: encodeSkillTemplate(decoded),
-    };
+    const resolvedSkills = resolveTemplateSkills(decoded.skills) as [
+      Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill
+    ];
+    return createBuildFromTemplate(decoded, resolvedSkills);
   } catch {
     return null;
   }
@@ -84,13 +79,7 @@ export default function App() {
   const [secondaryProfession, setSecondaryProfession] = useState<Profession | 'random' | 'none'>(() =>
     initialBuildFromUrl ? initialBuildFromUrl.secondaryProfession : 'random'
   );
-  const [selectedCampaigns, setSelectedCampaigns] = useState<Campaign[]>([
-    Campaign.Core,
-    Campaign.Prophecies,
-    Campaign.Factions,
-    Campaign.Nightfall,
-    Campaign.EyeOfTheNorth,
-  ]);
+  const [selectedCampaigns, setSelectedCampaigns] = useState<Campaign[]>(DEFAULT_CAMPAIGNS);
   const [includePvE, setIncludePvE] = useState(true);
   const [lockedElite, setLockedElite] = useState<'any' | 'none'>('any');
   const [sanityPreset, setSanityPreset] = useState<SanityPreset>('recommended');
@@ -117,13 +106,7 @@ export default function App() {
     generateBuild({
       primaryProfession: 'random',
       secondaryProfession: 'random',
-      campaigns: [
-        Campaign.Core,
-        Campaign.Prophecies,
-        Campaign.Factions,
-        Campaign.Nightfall,
-        Campaign.EyeOfTheNorth,
-      ],
+      campaigns: DEFAULT_CAMPAIGNS,
       includePvE: true,
       sanityConfig: DEFAULT_SANITY_CONFIG,
     })
@@ -131,13 +114,9 @@ export default function App() {
 
   // Roll Build Action
   const rollBuild = useCallback(() => {
-    const lockedList: Array<{ index: number; skillId: number }> = [];
-    lockedSlots.forEach(idx => {
-      const skill = build.skills[idx];
-      if (skill) {
-        lockedList.push({ index: idx, skillId: skill.id });
-      }
-    });
+    const lockedList = Array.from(lockedSlots)
+      .filter(idx => idx >= 0 && idx < 8 && build.skills[idx])
+      .map(idx => ({ index: idx, skillId: build.skills[idx].id }));
 
     const newBuild = generateBuild({
       primaryProfession,
@@ -163,13 +142,9 @@ export default function App() {
 
   // Reroll single slot action
   const rerollSlot = (slotIdx: number) => {
-    // Lock all slots EXCEPT slotIdx, then roll
-    const lockedList: Array<{ index: number; skillId: number }> = [];
-    for (let i = 0; i < 8; i++) {
-      if (i !== slotIdx) {
-        lockedList.push({ index: i, skillId: build.skills[i].id });
-      }
-    }
+    const lockedList = build.skills
+      .map((skill, index) => ({ index, skillId: skill.id }))
+      .filter(item => item.index !== slotIdx);
 
     const newBuild = generateBuild({
       primaryProfession: build.primaryProfession,
@@ -305,24 +280,7 @@ export default function App() {
     templateData: TemplateData;
     skills: [Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill];
   }) => {
-    const attributeAllocations = data.templateData.attributes.map(a => ({
-      attributeId: a.attributeId,
-      rank: a.rank,
-      cost: getCumulativeCost(a.rank),
-    }));
-    const totalUsed = attributeAllocations.reduce((sum, a) => sum + a.cost, 0);
-
-    const importedBuild: GeneratedBuild = {
-      primaryProfession: data.templateData.primaryProfession,
-      secondaryProfession: data.templateData.secondaryProfession,
-      skills: data.skills,
-      attributeAllocations,
-      totalPointsUsed: totalUsed,
-      remainingPoints: MAX_ATTRIBUTE_POINTS - totalUsed,
-      templateData: data.templateData,
-      templateCode: encodeSkillTemplate(data.templateData),
-    };
-
+    const importedBuild = createBuildFromTemplate(data.templateData, data.skills);
     setBuild(importedBuild);
     setPrimaryProfession(data.templateData.primaryProfession);
     setSecondaryProfession(data.templateData.secondaryProfession);
