@@ -1,22 +1,22 @@
 import { useState } from 'react';
 import { Settings, Dices, ChevronDown, ChevronUp } from 'lucide-react';
-import { ProfessionId } from '../data/types';
+import { Profession, Campaign } from '../data/types';
 import { PROFESSIONS, PLAYABLE_PROFESSION_IDS } from '../data/professions';
 import { SanityConfig } from '../core/generator/constraints';
 
 export type SanityPreset = 'recommended' | 'chaos' | 'custom';
 
 interface FilterPanelProps {
-  primaryProfession: ProfessionId | 'random';
-  secondaryProfession: ProfessionId | 'random' | 'none';
-  selectedCampaigns: number[];
+  primaryProfession: Profession | 'random';
+  secondaryProfession: Profession | 'random' | 'none';
+  selectedCampaigns: Campaign[];
   includePvE: boolean;
   lockedElite: 'any' | 'none';
   sanityPreset: SanityPreset;
   sanityConfig: SanityConfig;
-  onPrimaryChange: (prof: ProfessionId | 'random') => void;
-  onSecondaryChange: (prof: ProfessionId | 'random' | 'none') => void;
-  onToggleCampaign: (campaignId: number) => void;
+  onPrimaryChange: (prof: Profession | 'random') => void;
+  onSecondaryChange: (prof: Profession | 'random' | 'none') => void;
+  onToggleCampaign: (campaign: Campaign) => void;
   onTogglePvE: () => void;
   onLockedEliteChange: (elite: 'any' | 'none') => void;
   onSanityPresetChange: (preset: SanityPreset) => void;
@@ -25,11 +25,11 @@ interface FilterPanelProps {
 }
 
 const CAMPAIGNS = [
-  { id: 0, name: 'Core' },
-  { id: 1, name: 'Prophecies' },
-  { id: 2, name: 'Factions' },
-  { id: 3, name: 'Nightfall' },
-  { id: 4, name: 'Eye of the North' },
+  { id: Campaign.Core, name: 'Core' },
+  { id: Campaign.Prophecies, name: 'Prophecies' },
+  { id: Campaign.Factions, name: 'Factions' },
+  { id: Campaign.Nightfall, name: 'Nightfall' },
+  { id: Campaign.EyeOfTheNorth, name: 'Eye of the North' },
 ];
 
 export function FilterPanel({
@@ -80,7 +80,7 @@ export function FilterPanel({
             id="primary-prof-select"
             value={primaryProfession}
             onChange={e => {
-              const val = e.target.value === 'random' ? 'random' : (Number(e.target.value) as ProfessionId);
+              const val = e.target.value === 'random' ? 'random' : (Number(e.target.value) as Profession);
               onPrimaryChange(val);
             }}
             className="w-full bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-amber-500"
@@ -107,7 +107,7 @@ export function FilterPanel({
                 ? 'random'
                 : e.target.value === 'none'
                 ? 'none'
-                : (Number(e.target.value) as ProfessionId);
+                : (Number(e.target.value) as Profession);
               onSecondaryChange(val);
             }}
             className="w-full bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-amber-500"

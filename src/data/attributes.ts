@@ -1,9 +1,9 @@
-import { AttributeId, ProfessionId } from './types';
+import { Attribute, Profession } from './types';
 
 export interface AttributeInfo {
-  id: AttributeId;
+  id: Attribute;
   name: string;
-  professionId: ProfessionId;
+  professionId: Profession;
   isPrimary: boolean;
 }
 
@@ -55,55 +55,55 @@ export function getIncrementalCost(rank: number): number {
   return INCREMENTAL_ATTRIBUTE_COSTS[rank] ?? 0;
 }
 
-export const ATTRIBUTES: Record<AttributeId, AttributeInfo> = {
-  0:  { id: 0,  name: 'Fast Casting', professionId: 5, isPrimary: true },
-  1:  { id: 1,  name: 'Illusion Magic', professionId: 5, isPrimary: false },
-  2:  { id: 2,  name: 'Domination Magic', professionId: 5, isPrimary: false },
-  3:  { id: 3,  name: 'Inspiration Magic', professionId: 5, isPrimary: false },
-  4:  { id: 4,  name: 'Blood Magic', professionId: 4, isPrimary: false },
-  5:  { id: 5,  name: 'Death Magic', professionId: 4, isPrimary: false },
-  6:  { id: 6,  name: 'Soul Reaping', professionId: 4, isPrimary: true },
-  7:  { id: 7,  name: 'Curses', professionId: 4, isPrimary: false },
-  8:  { id: 8,  name: 'Air Magic', professionId: 6, isPrimary: false },
-  9:  { id: 9,  name: 'Earth Magic', professionId: 6, isPrimary: false },
-  10: { id: 10, name: 'Fire Magic', professionId: 6, isPrimary: false },
-  11: { id: 11, name: 'Water Magic', professionId: 6, isPrimary: false },
-  12: { id: 12, name: 'Energy Storage', professionId: 6, isPrimary: true },
-  13: { id: 13, name: 'Healing Prayers', professionId: 3, isPrimary: false },
-  14: { id: 14, name: 'Smiting Prayers', professionId: 3, isPrimary: false },
-  15: { id: 15, name: 'Protection Prayers', professionId: 3, isPrimary: false },
-  16: { id: 16, name: 'Divine Favor', professionId: 3, isPrimary: true },
-  17: { id: 17, name: 'Strength', professionId: 1, isPrimary: true },
-  18: { id: 18, name: 'Axe Mastery', professionId: 1, isPrimary: false },
-  19: { id: 19, name: 'Hammer Mastery', professionId: 1, isPrimary: false },
-  20: { id: 20, name: 'Swordsmanship', professionId: 1, isPrimary: false },
-  21: { id: 21, name: 'Tactics', professionId: 1, isPrimary: false },
-  22: { id: 22, name: 'Beast Mastery', professionId: 2, isPrimary: false },
-  23: { id: 23, name: 'Expertise', professionId: 2, isPrimary: true },
-  24: { id: 24, name: 'Wilderness Survival', professionId: 2, isPrimary: false },
-  25: { id: 25, name: 'Marksmanship', professionId: 2, isPrimary: false },
-  29: { id: 29, name: 'Dagger Mastery', professionId: 7, isPrimary: false },
-  30: { id: 30, name: 'Deadly Arts', professionId: 7, isPrimary: false },
-  31: { id: 31, name: 'Shadow Arts', professionId: 7, isPrimary: false },
-  32: { id: 32, name: 'Communing', professionId: 8, isPrimary: false },
-  33: { id: 33, name: 'Restoration Magic', professionId: 8, isPrimary: false },
-  34: { id: 34, name: 'Channeling Magic', professionId: 8, isPrimary: false },
-  35: { id: 35, name: 'Critical Strikes', professionId: 7, isPrimary: true },
-  36: { id: 36, name: 'Spawning Power', professionId: 8, isPrimary: true },
-  37: { id: 37, name: 'Spear Mastery', professionId: 9, isPrimary: false },
-  38: { id: 38, name: 'Command', professionId: 9, isPrimary: false },
-  39: { id: 39, name: 'Motivation', professionId: 9, isPrimary: false },
-  40: { id: 40, name: 'Leadership', professionId: 9, isPrimary: true },
-  41: { id: 41, name: 'Scythe Mastery', professionId: 10, isPrimary: false },
-  42: { id: 42, name: 'Wind Prayers', professionId: 10, isPrimary: false },
-  43: { id: 43, name: 'Earth Prayers', professionId: 10, isPrimary: false },
-  44: { id: 44, name: 'Mysticism', professionId: 10, isPrimary: true },
+export const ATTRIBUTES: Record<Attribute, AttributeInfo> = {
+  [Attribute.FastCasting]: { id: Attribute.FastCasting, name: 'Fast Casting', professionId: Profession.Mesmer, isPrimary: true },
+  [Attribute.IllusionMagic]: { id: Attribute.IllusionMagic, name: 'Illusion Magic', professionId: Profession.Mesmer, isPrimary: false },
+  [Attribute.DominationMagic]: { id: Attribute.DominationMagic, name: 'Domination Magic', professionId: Profession.Mesmer, isPrimary: false },
+  [Attribute.InspirationMagic]: { id: Attribute.InspirationMagic, name: 'Inspiration Magic', professionId: Profession.Mesmer, isPrimary: false },
+  [Attribute.BloodMagic]: { id: Attribute.BloodMagic, name: 'Blood Magic', professionId: Profession.Necromancer, isPrimary: false },
+  [Attribute.DeathMagic]: { id: Attribute.DeathMagic, name: 'Death Magic', professionId: Profession.Necromancer, isPrimary: false },
+  [Attribute.SoulReaping]: { id: Attribute.SoulReaping, name: 'Soul Reaping', professionId: Profession.Necromancer, isPrimary: true },
+  [Attribute.Curses]: { id: Attribute.Curses, name: 'Curses', professionId: Profession.Necromancer, isPrimary: false },
+  [Attribute.AirMagic]: { id: Attribute.AirMagic, name: 'Air Magic', professionId: Profession.Elementalist, isPrimary: false },
+  [Attribute.EarthMagic]: { id: Attribute.EarthMagic, name: 'Earth Magic', professionId: Profession.Elementalist, isPrimary: false },
+  [Attribute.FireMagic]: { id: Attribute.FireMagic, name: 'Fire Magic', professionId: Profession.Elementalist, isPrimary: false },
+  [Attribute.WaterMagic]: { id: Attribute.WaterMagic, name: 'Water Magic', professionId: Profession.Elementalist, isPrimary: false },
+  [Attribute.EnergyStorage]: { id: Attribute.EnergyStorage, name: 'Energy Storage', professionId: Profession.Elementalist, isPrimary: true },
+  [Attribute.HealingPrayers]: { id: Attribute.HealingPrayers, name: 'Healing Prayers', professionId: Profession.Monk, isPrimary: false },
+  [Attribute.SmitingPrayers]: { id: Attribute.SmitingPrayers, name: 'Smiting Prayers', professionId: Profession.Monk, isPrimary: false },
+  [Attribute.ProtectionPrayers]: { id: Attribute.ProtectionPrayers, name: 'Protection Prayers', professionId: Profession.Monk, isPrimary: false },
+  [Attribute.DivineFavor]: { id: Attribute.DivineFavor, name: 'Divine Favor', professionId: Profession.Monk, isPrimary: true },
+  [Attribute.Strength]: { id: Attribute.Strength, name: 'Strength', professionId: Profession.Warrior, isPrimary: true },
+  [Attribute.AxeMastery]: { id: Attribute.AxeMastery, name: 'Axe Mastery', professionId: Profession.Warrior, isPrimary: false },
+  [Attribute.HammerMastery]: { id: Attribute.HammerMastery, name: 'Hammer Mastery', professionId: Profession.Warrior, isPrimary: false },
+  [Attribute.Swordsmanship]: { id: Attribute.Swordsmanship, name: 'Swordsmanship', professionId: Profession.Warrior, isPrimary: false },
+  [Attribute.Tactics]: { id: Attribute.Tactics, name: 'Tactics', professionId: Profession.Warrior, isPrimary: false },
+  [Attribute.BeastMastery]: { id: Attribute.BeastMastery, name: 'Beast Mastery', professionId: Profession.Ranger, isPrimary: false },
+  [Attribute.Expertise]: { id: Attribute.Expertise, name: 'Expertise', professionId: Profession.Ranger, isPrimary: true },
+  [Attribute.WildernessSurvival]: { id: Attribute.WildernessSurvival, name: 'Wilderness Survival', professionId: Profession.Ranger, isPrimary: false },
+  [Attribute.Marksmanship]: { id: Attribute.Marksmanship, name: 'Marksmanship', professionId: Profession.Ranger, isPrimary: false },
+  [Attribute.DaggerMastery]: { id: Attribute.DaggerMastery, name: 'Dagger Mastery', professionId: Profession.Assassin, isPrimary: false },
+  [Attribute.DeadlyArts]: { id: Attribute.DeadlyArts, name: 'Deadly Arts', professionId: Profession.Assassin, isPrimary: false },
+  [Attribute.ShadowArts]: { id: Attribute.ShadowArts, name: 'Shadow Arts', professionId: Profession.Assassin, isPrimary: false },
+  [Attribute.Communing]: { id: Attribute.Communing, name: 'Communing', professionId: Profession.Ritualist, isPrimary: false },
+  [Attribute.RestorationMagic]: { id: Attribute.RestorationMagic, name: 'Restoration Magic', professionId: Profession.Ritualist, isPrimary: false },
+  [Attribute.ChannelingMagic]: { id: Attribute.ChannelingMagic, name: 'Channeling Magic', professionId: Profession.Ritualist, isPrimary: false },
+  [Attribute.CriticalStrikes]: { id: Attribute.CriticalStrikes, name: 'Critical Strikes', professionId: Profession.Assassin, isPrimary: true },
+  [Attribute.SpawningPower]: { id: Attribute.SpawningPower, name: 'Spawning Power', professionId: Profession.Ritualist, isPrimary: true },
+  [Attribute.SpearMastery]: { id: Attribute.SpearMastery, name: 'Spear Mastery', professionId: Profession.Paragon, isPrimary: false },
+  [Attribute.Command]: { id: Attribute.Command, name: 'Command', professionId: Profession.Paragon, isPrimary: false },
+  [Attribute.Motivation]: { id: Attribute.Motivation, name: 'Motivation', professionId: Profession.Paragon, isPrimary: false },
+  [Attribute.Leadership]: { id: Attribute.Leadership, name: 'Leadership', professionId: Profession.Paragon, isPrimary: true },
+  [Attribute.ScytheMastery]: { id: Attribute.ScytheMastery, name: 'Scythe Mastery', professionId: Profession.Dervish, isPrimary: false },
+  [Attribute.WindPrayers]: { id: Attribute.WindPrayers, name: 'Wind Prayers', professionId: Profession.Dervish, isPrimary: false },
+  [Attribute.EarthPrayers]: { id: Attribute.EarthPrayers, name: 'Earth Prayers', professionId: Profession.Dervish, isPrimary: false },
+  [Attribute.Mysticism]: { id: Attribute.Mysticism, name: 'Mysticism', professionId: Profession.Dervish, isPrimary: true },
 };
 
-export function getAttribute(id: AttributeId): AttributeInfo | undefined {
+export function getAttribute(id: Attribute): AttributeInfo | undefined {
   return ATTRIBUTES[id];
 }
 
-export function getProfessionAttributes(professionId: ProfessionId): AttributeInfo[] {
+export function getProfessionAttributes(professionId: Profession): AttributeInfo[] {
   return Object.values(ATTRIBUTES).filter(attr => attr.professionId === professionId);
 }

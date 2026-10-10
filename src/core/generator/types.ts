@@ -1,10 +1,10 @@
-import { ProfessionId, Gw1Skill, TemplateData } from '../../data/types';
+import { Profession, Gw1Skill, TemplateData } from '../../data/types';
 import { AttributeAllocation } from '../allocator/attributeAllocator';
 import { SanityConfig } from './constraints';
 
 export interface RandomizerOptions {
-  primaryProfession?: ProfessionId | 'random';
-  secondaryProfession?: ProfessionId | 'random' | 'none';
+  primaryProfession?: Profession | 'random';
+  secondaryProfession?: Profession | 'random' | 'none';
   lockedSlots?: Array<{ index: number; skillId: number }>;
   lockedEliteId?: number | 'none';
   campaigns?: number[];
@@ -13,8 +13,8 @@ export interface RandomizerOptions {
 }
 
 export interface GeneratedBuild {
-  primaryProfession: ProfessionId;
-  secondaryProfession: ProfessionId;
+  primaryProfession: Profession;
+  secondaryProfession: Profession;
   skills: [Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill];
   attributeAllocations: AttributeAllocation[];
   totalPointsUsed: number;

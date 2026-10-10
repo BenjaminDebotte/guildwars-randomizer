@@ -4,14 +4,14 @@ import { SkillSlot } from './SkillSlot';
 import { SkillBar } from './SkillBar';
 import { AttributePanel } from './AttributePanel';
 import { CodeExportModal } from './CodeExportModal';
-import { Gw1Skill } from '../data/types';
+import { Gw1Skill, Profession, Attribute, Campaign } from '../data/types';
 
 const mockSkill: Gw1Skill = {
   id: 1,
   name: 'Healing Signet',
-  profession: 1,
-  attribute: 21,
-  campaign: 0,
+  profession: Profession.Warrior,
+  attribute: Attribute.Tactics,
+  campaign: Campaign.Core,
   isElite: false,
   isPvEOnly: false,
   type: 'Signet',
@@ -24,9 +24,9 @@ const mockSkill: Gw1Skill = {
 const mockEliteSkill: Gw1Skill = {
   id: 378,
   name: 'Shield Stance',
-  profession: 1,
-  attribute: 21,
-  campaign: 0,
+  profession: Profession.Warrior,
+  attribute: Attribute.Tactics,
+  campaign: Campaign.Core,
   isElite: true,
   isPvEOnly: false,
   type: 'Stance',
@@ -94,8 +94,8 @@ describe('SkillBar Component', () => {
       <SkillBar
         skills={skills}
         lockedSlots={new Set([0])}
-        primaryProfession={1}
-        secondaryProfession={2}
+        primaryProfession={Profession.Warrior}
+        secondaryProfession={Profession.Ranger}
         onToggleLock={vi.fn()}
         onRerollSlot={vi.fn()}
         onLockAll={handleLockAll}
@@ -120,8 +120,8 @@ describe('AttributePanel Component', () => {
   it('displays allocated attributes and dispatches rank adjustments', () => {
     const handleUpdateRank = vi.fn();
     const allocations = [
-      { attributeId: 17 as const, rank: 12, cost: 97 },
-      { attributeId: 20 as const, rank: 10, cost: 61 },
+      { attributeId: Attribute.Strength, rank: 12, cost: 97 },
+      { attributeId: Attribute.Swordsmanship, rank: 10, cost: 61 },
     ];
 
     render(

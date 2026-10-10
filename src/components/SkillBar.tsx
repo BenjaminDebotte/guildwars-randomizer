@@ -1,13 +1,13 @@
 import { Lock, Unlock } from 'lucide-react';
-import { Gw1Skill, ProfessionId } from '../data/types';
+import { Gw1Skill, Profession } from '../data/types';
 import { getProfession } from '../data/professions';
 import { SkillSlot } from './SkillSlot';
 
 interface SkillBarProps {
   skills: [Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill];
   lockedSlots: Set<number>;
-  primaryProfession: ProfessionId;
-  secondaryProfession: ProfessionId;
+  primaryProfession: Profession;
+  secondaryProfession: Profession;
   onToggleLock: (index: number) => void;
   onRerollSlot: (index: number) => void;
   onLockAll: () => void;

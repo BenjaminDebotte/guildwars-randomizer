@@ -1,13 +1,13 @@
 import { AttributeAllocation } from '../core/allocator/attributeAllocator';
 import { getAttribute, getCumulativeCost, MAX_ATTRIBUTE_POINTS, MAX_ATTRIBUTE_RANK } from '../data/attributes';
 import { Plus, Minus } from 'lucide-react';
-import { AttributeId } from '../data/types';
+import { Attribute } from '../data/types';
 
 interface AttributePanelProps {
   allocations: AttributeAllocation[];
   totalPointsUsed: number;
   remainingPoints: number;
-  onUpdateRank: (attributeId: AttributeId, newRank: number) => void;
+  onUpdateRank: (attributeId: Attribute, newRank: number) => void;
 }
 
 export function AttributePanel({

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Copy, Check, ArrowDownToLine } from 'lucide-react';
-import { ProfessionId, AttributeId, TemplateData, Gw1Skill } from './data/types';
+import { Profession, Attribute, Campaign, TemplateData, Gw1Skill } from './data/types';
 import { generateBuild } from './core/generator/randomizer';
 import { GeneratedBuild } from './core/generator/types';
 import { SanityConfig, DEFAULT_SANITY_CONFIG, CHAOS_SANITY_CONFIG } from './core/generator/constraints';
@@ -13,9 +13,15 @@ import { CodeExportModal } from './components/CodeExportModal';
 
 export default function App() {
   // Filter & Configuration State
-  const [primaryProfession, setPrimaryProfession] = useState<ProfessionId | 'random'>('random');
-  const [secondaryProfession, setSecondaryProfession] = useState<ProfessionId | 'random' | 'none'>('random');
-  const [selectedCampaigns, setSelectedCampaigns] = useState<number[]>([0, 1, 2, 3, 4]);
+  const [primaryProfession, setPrimaryProfession] = useState<Profession | 'random'>('random');
+  const [secondaryProfession, setSecondaryProfession] = useState<Profession | 'random' | 'none'>('random');
+  const [selectedCampaigns, setSelectedCampaigns] = useState<Campaign[]>([
+    Campaign.Core,
+    Campaign.Prophecies,
+    Campaign.Factions,
+    Campaign.Nightfall,
+    Campaign.EyeOfTheNorth,
+  ]);
   const [includePvE, setIncludePvE] = useState(true);
   const [lockedElite, setLockedElite] = useState<'any' | 'none'>('any');
   const [sanityPreset, setSanityPreset] = useState<SanityPreset>('recommended');
@@ -41,7 +47,13 @@ export default function App() {
     generateBuild({
       primaryProfession: 'random',
       secondaryProfession: 'random',
-      campaigns: [0, 1, 2, 3, 4],
+      campaigns: [
+        Campaign.Core,
+        Campaign.Prophecies,
+        Campaign.Factions,
+        Campaign.Nightfall,
+        Campaign.EyeOfTheNorth,
+      ],
       includePvE: true,
       sanityConfig: DEFAULT_SANITY_CONFIG,
     })
@@ -140,7 +152,7 @@ export default function App() {
   const unlockAll = () => setLockedSlots(new Set());
 
   // Campaign Toggles
-  const toggleCampaign = (id: number) => {
+  const toggleCampaign = (id: Campaign) => {
     setSelectedCampaigns(prev => {
       if (prev.includes(id)) {
         if (prev.length === 1) return prev; // Keep at least one
@@ -151,7 +163,7 @@ export default function App() {
   };
 
   // Manual Attribute Rank Modification
-  const handleUpdateRank = (attributeId: AttributeId, newRank: number) => {
+  const handleUpdateRank = (attributeId: Attribute, newRank: number) => {
     const updatedAllocations = build.attributeAllocations.map(a =>
       a.attributeId === attributeId
         ? { ...a, rank: newRank, cost: getCumulativeCost(newRank) }

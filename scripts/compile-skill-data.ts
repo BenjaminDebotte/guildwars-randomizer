@@ -3,6 +3,9 @@ import path from 'path';
 import { createRequire } from 'module';
 import type {
   Gw1Skill,
+  Profession,
+  Campaign,
+  Attribute,
   SkillType,
   WeaponRequirement,
   ComboChainStep,
@@ -205,15 +208,15 @@ for (let i = 1; i <= 4000; i++) {
     const isPvEOnly = Boolean(
       a.is_rp ||
       (a.attribute >= 102 && a.attribute <= 109) ||
-      a.profession === 0 && a.id !== 2 // Resurrection Signet is PvP legal
+      (a.profession === 0 && a.id !== 2) // Resurrection Signet is PvP legal
     );
 
     const skill: Gw1Skill = {
       id: a.id,
       name: a.name,
-      profession: a.profession,
-      attribute: a.attribute <= 44 ? a.attribute : null,
-      campaign: a.campaign,
+      profession: a.profession as Profession,
+      attribute: a.attribute <= 44 ? (a.attribute as Attribute) : null,
+      campaign: a.campaign as Campaign,
       isElite: Boolean(a.is_elite),
       isPvEOnly,
       type: mapSkillType(typeId),

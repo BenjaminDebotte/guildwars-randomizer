@@ -3,16 +3,17 @@ import { generateBuild } from './randomizer';
 import { decodeSkillTemplate } from '../codec/templateCodec';
 import { validateSkillBar, DEFAULT_SANITY_CONFIG } from './constraints';
 import { getSkillById } from '../../data/skills';
+import { Profession } from '../../data/types';
 
 describe('Randomizer Engine', () => {
   it('generates a complete valid build with attributes and template code', () => {
     const build = generateBuild({
-      primaryProfession: 1, // Warrior
-      secondaryProfession: 2, // Ranger
+      primaryProfession: Profession.Warrior,
+      secondaryProfession: Profession.Ranger,
     });
 
-    expect(build.primaryProfession).toBe(1);
-    expect(build.secondaryProfession).toBe(2);
+    expect(build.primaryProfession).toBe(Profession.Warrior);
+    expect(build.secondaryProfession).toBe(Profession.Ranger);
     expect(build.skills.length).toBe(8);
     expect(build.totalPointsUsed).toBeLessThanOrEqual(200);
     expect(typeof build.templateCode).toBe('string');
@@ -30,8 +31,8 @@ describe('Randomizer Engine', () => {
     const shieldStance = getSkillById(378)!; // Shield Stance
 
     const build = generateBuild({
-      primaryProfession: 1,
-      secondaryProfession: 0,
+      primaryProfession: Profession.Warrior,
+      secondaryProfession: Profession.None,
       lockedSlots: [
         { index: 0, skillId: healingSig.id },
         { index: 7, skillId: shieldStance.id },

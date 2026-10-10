@@ -1,4 +1,4 @@
-import { Gw1Skill } from '../data/types';
+import { Gw1Skill, Campaign } from '../data/types';
 import { getAttribute } from '../data/attributes';
 import { getProfession } from '../data/professions';
 
@@ -6,7 +6,13 @@ interface SkillTooltipProps {
   skill: Gw1Skill | null;
 }
 
-const CAMPAIGN_NAMES = ['Core', 'Prophecies', 'Factions', 'Nightfall', 'Eye of the North'];
+const CAMPAIGN_NAMES: Record<Campaign, string> = {
+  [Campaign.Core]: 'Core',
+  [Campaign.Prophecies]: 'Prophecies',
+  [Campaign.Factions]: 'Factions',
+  [Campaign.Nightfall]: 'Nightfall',
+  [Campaign.EyeOfTheNorth]: 'Eye of the North',
+};
 
 export function SkillTooltip({ skill }: SkillTooltipProps) {
   if (!skill) return null;

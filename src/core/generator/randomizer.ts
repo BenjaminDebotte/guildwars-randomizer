@@ -1,4 +1,4 @@
-import { ProfessionId, Gw1Skill, TemplateData } from '../../data/types';
+import { Profession, Gw1Skill, TemplateData } from '../../data/types';
 import { PLAYABLE_PROFESSION_IDS } from '../../data/professions';
 import { getAvailableSkills, getSkillById } from '../../data/skills';
 import { canAddSkill, validateSkillBar, DEFAULT_SANITY_CONFIG, SanityConfig } from './constraints';
@@ -32,7 +32,7 @@ export function generateBuild(options: RandomizerOptions = {}): GeneratedBuild {
   };
 
   // 1. Resolve Primary Profession
-  let primaryProf: ProfessionId;
+  let primaryProf: Profession;
   if (options.primaryProfession && options.primaryProfession !== 'random') {
     primaryProf = options.primaryProfession;
   } else {
@@ -40,9 +40,9 @@ export function generateBuild(options: RandomizerOptions = {}): GeneratedBuild {
   }
 
   // 2. Resolve Secondary Profession
-  let secProf: ProfessionId;
-  if (options.secondaryProfession === 'none' || options.secondaryProfession === 0) {
-    secProf = 0;
+  let secProf: Profession;
+  if (options.secondaryProfession === 'none' || options.secondaryProfession === Profession.None) {
+    secProf = Profession.None;
   } else if (
     options.secondaryProfession !== undefined &&
     options.secondaryProfession !== 'random' &&
@@ -128,7 +128,6 @@ export function generateBuild(options: RandomizerOptions = {}): GeneratedBuild {
       const candidates = pool.filter(candidate => {
         // If locked elite is 'none', forbid elites
         if (options.lockedEliteId === 'none' && candidate.isElite) return false;
-        // If we are on the last few slots and still need an elite (and not 'none'), check
         return canAddSkill(currentBar, candidate, sanityConfig, primaryProf, secProf);
       });
 
@@ -138,7 +137,6 @@ export function generateBuild(options: RandomizerOptions = {}): GeneratedBuild {
       }
 
       // Prioritize filling dependencies if needed
-      // (e.g. if we have a pet attack, try to pick pet enabler if present in candidates)
       const needsPetEnabler = currentBar.some(s => s.requiresPet) && !currentBar.some(s => s.isPetEnabler);
       const needsLead = currentBar.some(s => s.comboChainStep === 'Offhand' || s.comboChainStep === 'Dual') &&
         !currentBar.some(s => s.comboChainStep === 'Lead');
@@ -216,7 +214,6 @@ export function generateBuild(options: RandomizerOptions = {}): GeneratedBuild {
     for (const lock of options.lockedSlots) {
       const lockedSkill = getSkillById(lock.skillId);
       if (lockedSkill && lock.index >= 0 && lock.index < 8) {
-        // Find where lockedSkill is in finalTuple and swap
         const currIdx = finalTuple.findIndex(s => s.id === lockedSkill.id);
         if (currIdx !== -1 && currIdx !== lock.index) {
           const temp = finalTuple[lock.index] as Gw1Skill;

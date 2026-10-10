@@ -1,4 +1,4 @@
-import { AttributeId, ProfessionId, Gw1Skill } from '../../data/types';
+import { Attribute, Profession, Gw1Skill } from '../../data/types';
 import {
   MAX_ATTRIBUTE_POINTS,
   MAX_ATTRIBUTE_RANK,
@@ -9,7 +9,7 @@ import {
 import { PROFESSIONS } from '../../data/professions';
 
 export interface AttributeAllocation {
-  attributeId: AttributeId;
+  attributeId: Attribute;
   rank: number;
   cost: number;
 }
@@ -21,30 +21,30 @@ export interface AllocationResult {
 }
 
 export interface AllocateOptions {
-  primaryProfession: ProfessionId;
-  secondaryProfession?: ProfessionId;
+  primaryProfession: Profession;
+  secondaryProfession?: Profession;
   skills: Gw1Skill[];
 }
 
-const DEFAULT_UTILITY_ATTRIBUTES: Record<ProfessionId, AttributeId> = {
-  0: 0,
-  1: 21,  // Warrior -> Tactics
-  2: 24,  // Ranger -> Wilderness Survival
-  3: 15,  // Monk -> Protection Prayers
-  4: 7,   // Necromancer -> Curses
-  5: 3,   // Mesmer -> Inspiration Magic
-  6: 8,   // Elementalist -> Air Magic (distinct from primary Energy Storage 12)
-  7: 31,  // Assassin -> Shadow Arts
-  8: 32,  // Ritualist -> Communing
-  9: 38,  // Paragon -> Command
-  10: 43, // Dervish -> Earth Prayers
+const DEFAULT_UTILITY_ATTRIBUTES: Record<Profession, Attribute> = {
+  [Profession.None]: Attribute.FastCasting,
+  [Profession.Warrior]: Attribute.Tactics,
+  [Profession.Ranger]: Attribute.WildernessSurvival,
+  [Profession.Monk]: Attribute.ProtectionPrayers,
+  [Profession.Necromancer]: Attribute.Curses,
+  [Profession.Mesmer]: Attribute.InspirationMagic,
+  [Profession.Elementalist]: Attribute.AirMagic,
+  [Profession.Assassin]: Attribute.ShadowArts,
+  [Profession.Ritualist]: Attribute.Communing,
+  [Profession.Paragon]: Attribute.Command,
+  [Profession.Dervish]: Attribute.EarthPrayers,
 };
 
 /**
  * Optimizes the 200 Attribute Point budget based on the 8 slotted skills.
  */
 export function allocateAttributePoints(options: AllocateOptions): AllocationResult {
-  const { primaryProfession, secondaryProfession = 0, skills } = options;
+  const { primaryProfession, secondaryProfession = Profession.None, skills } = options;
 
   const primaryProfInfo = PROFESSIONS[primaryProfession];
   const secondaryProfInfo = PROFESSIONS[secondaryProfession];
@@ -52,7 +52,7 @@ export function allocateAttributePoints(options: AllocateOptions): AllocationRes
   const secondaryPrimaryAttrId = secondaryProfInfo?.primaryAttributeId ?? null;
 
   // 1. Count skill frequency per attribute (ignoring null or title tracks or secondary primary)
-  const attributeCounts = new Map<AttributeId, number>();
+  const attributeCounts = new Map<Attribute, number>();
 
   for (const skill of skills) {
     if (skill.attribute === null || skill.attribute === undefined) continue;
@@ -81,7 +81,7 @@ export function allocateAttributePoints(options: AllocateOptions): AllocationRes
   const activeAttrIds = activeEntries.map(e => e[0]);
 
   // Ensure fallback attributes if fewer than 2 active attributes
-  if (!activeAttrIds.includes(primaryAttributeId as AttributeId) && primaryAttributeId !== null) {
+  if (!activeAttrIds.includes(primaryAttributeId as Attribute) && primaryAttributeId !== null) {
     activeAttrIds.push(primaryAttributeId);
   }
 
@@ -91,7 +91,7 @@ export function allocateAttributePoints(options: AllocateOptions): AllocationRes
   }
 
   // 3. Determine rank allocation strategy
-  const ranks = new Map<AttributeId, number>();
+  const ranks = new Map<Attribute, number>();
   for (const id of activeAttrIds) {
     ranks.set(id, 0);
   }
@@ -103,9 +103,9 @@ export function allocateAttributePoints(options: AllocateOptions): AllocationRes
   const attr2 = activeAttrIds[1];
   const attr3 = activeAttrIds[2];
 
-  const count1 = attributeCounts.get(attr1 ?? -1 as AttributeId) || 0;
-  const count2 = attributeCounts.get(attr2 ?? -1 as AttributeId) || 0;
-  const count3 = attributeCounts.get(attr3 ?? -1 as AttributeId) || 0;
+  const count1 = attributeCounts.get(attr1 ?? -1 as Attribute) || 0;
+  const count2 = attributeCounts.get(attr2 ?? -1 as Attribute) || 0;
+  const count3 = attributeCounts.get(attr3 ?? -1 as Attribute) || 0;
 
   if (activeAttrIds.length === 2 && attr1 !== undefined && attr2 !== undefined) {
     // 12 / 12 spread (97 + 97 = 194 pts, leaves 6 pts)
@@ -152,7 +152,6 @@ export function allocateAttributePoints(options: AllocateOptions): AllocationRes
     }
   } else {
     // General greedy fallback for 1 or 4+ attributes
-    // Start with rank 0 on all, greedily increment highest priority attribute that can be afforded
     let improved = true;
     while (improved && remainingBudget > 0) {
       improved = false;

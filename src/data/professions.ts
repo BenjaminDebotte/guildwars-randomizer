@@ -1,111 +1,122 @@
-import { ProfessionId, AttributeId } from './types';
+import { Profession, Attribute } from './types';
 
 export interface ProfessionInfo {
-  id: ProfessionId;
+  id: Profession;
   name: string;
   code: string;
-  primaryAttributeId: AttributeId | null;
+  primaryAttributeId: Attribute | null;
   baseEnergy: number;
   energyRegenPips: number; // 2 pips = 0.67 e/s, 3 pips = 1.0 e/s, 4 pips = 1.33 e/s
 }
 
-export const PROFESSIONS: Record<ProfessionId, ProfessionInfo> = {
-  0: {
-    id: 0,
+export const PROFESSIONS: Record<Profession, ProfessionInfo> = {
+  [Profession.None]: {
+    id: Profession.None,
     name: 'None',
     code: 'None',
     primaryAttributeId: null,
     baseEnergy: 20,
     energyRegenPips: 2,
   },
-  1: {
-    id: 1,
+  [Profession.Warrior]: {
+    id: Profession.Warrior,
     name: 'Warrior',
     code: 'W',
-    primaryAttributeId: 17, // Strength
+    primaryAttributeId: Attribute.Strength,
     baseEnergy: 20,
     energyRegenPips: 2,
   },
-  2: {
-    id: 2,
+  [Profession.Ranger]: {
+    id: Profession.Ranger,
     name: 'Ranger',
     code: 'R',
-    primaryAttributeId: 23, // Expertise
+    primaryAttributeId: Attribute.Expertise,
     baseEnergy: 20,
     energyRegenPips: 3,
   },
-  3: {
-    id: 3,
+  [Profession.Monk]: {
+    id: Profession.Monk,
     name: 'Monk',
     code: 'Mo',
-    primaryAttributeId: 16, // Divine Favor
+    primaryAttributeId: Attribute.DivineFavor,
     baseEnergy: 20,
     energyRegenPips: 4,
   },
-  4: {
-    id: 4,
+  [Profession.Necromancer]: {
+    id: Profession.Necromancer,
     name: 'Necromancer',
     code: 'N',
-    primaryAttributeId: 6, // Soul Reaping
+    primaryAttributeId: Attribute.SoulReaping,
     baseEnergy: 20,
     energyRegenPips: 4,
   },
-  5: {
-    id: 5,
+  [Profession.Mesmer]: {
+    id: Profession.Mesmer,
     name: 'Mesmer',
     code: 'Me',
-    primaryAttributeId: 0, // Fast Casting
+    primaryAttributeId: Attribute.FastCasting,
     baseEnergy: 20,
     energyRegenPips: 4,
   },
-  6: {
-    id: 6,
+  [Profession.Elementalist]: {
+    id: Profession.Elementalist,
     name: 'Elementalist',
     code: 'E',
-    primaryAttributeId: 12, // Energy Storage
+    primaryAttributeId: Attribute.EnergyStorage,
     baseEnergy: 20,
     energyRegenPips: 4,
   },
-  7: {
-    id: 7,
+  [Profession.Assassin]: {
+    id: Profession.Assassin,
     name: 'Assassin',
     code: 'A',
-    primaryAttributeId: 35, // Critical Strikes
+    primaryAttributeId: Attribute.CriticalStrikes,
     baseEnergy: 20,
     energyRegenPips: 2,
   },
-  8: {
-    id: 8,
+  [Profession.Ritualist]: {
+    id: Profession.Ritualist,
     name: 'Ritualist',
     code: 'Rt',
-    primaryAttributeId: 36, // Spawning Power
+    primaryAttributeId: Attribute.SpawningPower,
     baseEnergy: 20,
     energyRegenPips: 4,
   },
-  9: {
-    id: 9,
+  [Profession.Paragon]: {
+    id: Profession.Paragon,
     name: 'Paragon',
     code: 'P',
-    primaryAttributeId: 40, // Leadership
+    primaryAttributeId: Attribute.Leadership,
     baseEnergy: 20,
     energyRegenPips: 2,
   },
-  10: {
-    id: 10,
+  [Profession.Dervish]: {
+    id: Profession.Dervish,
     name: 'Dervish',
     code: 'D',
-    primaryAttributeId: 44, // Mysticism
+    primaryAttributeId: Attribute.Mysticism,
     baseEnergy: 25,
     energyRegenPips: 2,
   },
 };
 
-export const PLAYABLE_PROFESSION_IDS: ProfessionId[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+export const PLAYABLE_PROFESSION_IDS: Profession[] = [
+  Profession.Warrior,
+  Profession.Ranger,
+  Profession.Monk,
+  Profession.Necromancer,
+  Profession.Mesmer,
+  Profession.Elementalist,
+  Profession.Assassin,
+  Profession.Ritualist,
+  Profession.Paragon,
+  Profession.Dervish,
+];
 
-export function getProfession(id: ProfessionId): ProfessionInfo {
-  return PROFESSIONS[id] ?? PROFESSIONS[0];
+export function getProfession(id: Profession): ProfessionInfo {
+  return PROFESSIONS[id] ?? PROFESSIONS[Profession.None];
 }
 
-export function isPrimaryAttribute(attributeId: AttributeId, professionId: ProfessionId): boolean {
+export function isPrimaryAttribute(attributeId: Attribute, professionId: Profession): boolean {
   return PROFESSIONS[professionId]?.primaryAttributeId === attributeId;
 }

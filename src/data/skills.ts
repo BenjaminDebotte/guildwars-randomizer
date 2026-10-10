@@ -1,5 +1,5 @@
 import rawSkills from './skills.json';
-import { Gw1Skill, ProfessionId } from './types';
+import { Gw1Skill, Profession } from './types';
 
 export const SKILLS: Gw1Skill[] = rawSkills as Gw1Skill[];
 
@@ -12,12 +12,12 @@ export function getSkillById(id: number): Gw1Skill | undefined {
 }
 
 export function getAvailableSkills(options: {
-  primaryProfession: ProfessionId;
-  secondaryProfession?: ProfessionId;
+  primaryProfession: Profession;
+  secondaryProfession?: Profession;
   campaigns?: number[];
   includePvE?: boolean;
 }): Gw1Skill[] {
-  const { primaryProfession, secondaryProfession = 0, campaigns, includePvE = true } = options;
+  const { primaryProfession, secondaryProfession = Profession.None, campaigns, includePvE = true } = options;
 
   return SKILLS.filter(skill => {
     // Campaign filtering
@@ -31,10 +31,10 @@ export function getAvailableSkills(options: {
     }
 
     // Profession eligibility:
-    // Can equip Primary profession skills, Secondary profession skills, or Common (profession 0) skills
+    // Can equip Primary profession skills, Secondary profession skills, or Common skills
     if (skill.profession === primaryProfession) return true;
-    if (secondaryProfession !== 0 && skill.profession === secondaryProfession) return true;
-    if (skill.profession === 0) return true;
+    if (secondaryProfession !== Profession.None && skill.profession === secondaryProfession) return true;
+    if (skill.profession === Profession.None) return true;
 
     return false;
   });

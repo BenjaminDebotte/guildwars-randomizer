@@ -1,53 +1,79 @@
-export type ProfessionId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-// 0: None, 1: Warrior, 2: Ranger, 3: Monk, 4: Necromancer, 5: Mesmer,
-// 6: Elementalist, 7: Assassin, 8: Ritualist, 9: Paragon, 10: Dervish
+export enum Profession {
+  None = 0,
+  Warrior = 1,
+  Ranger = 2,
+  Monk = 3,
+  Necromancer = 4,
+  Mesmer = 5,
+  Elementalist = 6,
+  Assassin = 7,
+  Ritualist = 8,
+  Paragon = 9,
+  Dervish = 10,
+}
 
-export type CampaignId = 0 | 1 | 2 | 3 | 4;
-// 0: Core, 1: Prophecies, 2: Factions, 3: Nightfall, 4: Eye of the North
+export type ProfessionId = Profession;
 
-export type AttributeId =
-  | 0  // Fast Casting (Me)
-  | 1  // Illusion Magic (Me)
-  | 2  // Domination Magic (Me)
-  | 3  // Inspiration Magic (Me)
-  | 4  // Blood Magic (N)
-  | 5  // Death Magic (N)
-  | 6  // Soul Reaping (N)
-  | 7  // Curses (N)
-  | 8  // Air Magic (E)
-  | 9  // Earth Magic (E)
-  | 10 // Fire Magic (E)
-  | 11 // Water Magic (E)
-  | 12 // Energy Storage (E)
-  | 13 // Healing Prayers (Mo)
-  | 14 // Smiting Prayers (Mo)
-  | 15 // Protection Prayers (Mo)
-  | 16 // Divine Favor (Mo)
-  | 17 // Strength (W)
-  | 18 // Axe Mastery (W)
-  | 19 // Hammer Mastery (W)
-  | 20 // Swordsmanship (W)
-  | 21 // Tactics (W)
-  | 22 // Beast Mastery (R)
-  | 23 // Expertise (R)
-  | 24 // Wilderness Survival (R)
-  | 25 // Marksmanship (R)
-  | 29 // Dagger Mastery (A)
-  | 30 // Deadly Arts (A)
-  | 31 // Shadow Arts (A)
-  | 32 // Communing (Rt)
-  | 33 // Restoration Magic (Rt)
-  | 34 // Channeling Magic (Rt)
-  | 35 // Critical Strikes (A)
-  | 36 // Spawning Power (Rt)
-  | 37 // Spear Mastery (P)
-  | 38 // Command (P)
-  | 39 // Motivation (P)
-  | 40 // Leadership (P)
-  | 41 // Scythe Mastery (D)
-  | 42 // Wind Prayers (D)
-  | 43 // Earth Prayers (D)
-  | 44; // Mysticism (D)
+export enum Campaign {
+  Core = 0,
+  Prophecies = 1,
+  Factions = 2,
+  Nightfall = 3,
+  EyeOfTheNorth = 4,
+}
+
+export type CampaignId = Campaign;
+
+export enum Attribute {
+  FastCasting = 0,
+  IllusionMagic = 1,
+  DominationMagic = 2,
+  InspirationMagic = 3,
+  BloodMagic = 4,
+  DeathMagic = 5,
+  SoulReaping = 6,
+  Curses = 7,
+  AirMagic = 8,
+  EarthMagic = 9,
+  FireMagic = 10,
+  WaterMagic = 11,
+  EnergyStorage = 12,
+  HealingPrayers = 13,
+  SmitingPrayers = 14,
+  ProtectionPrayers = 15,
+  DivineFavor = 16,
+  Strength = 17,
+  AxeMastery = 18,
+  HammerMastery = 19,
+  Swordsmanship = 20,
+  Tactics = 21,
+  BeastMastery = 22,
+  Expertise = 23,
+  WildernessSurvival = 24,
+  Marksmanship = 25,
+  DaggerMastery = 29,
+  DeadlyArts = 30,
+  ShadowArts = 31,
+  Communing = 32,
+  RestorationMagic = 33,
+  ChannelingMagic = 34,
+  CriticalStrikes = 35,
+  SpawningPower = 36,
+  SpearMastery = 37,
+  Command = 38,
+  Motivation = 39,
+  Leadership = 40,
+  ScytheMastery = 41,
+  WindPrayers = 42,
+  EarthPrayers = 43,
+  Mysticism = 44,
+}
+
+export type AttributeId = Attribute;
+
+export enum TemplateType {
+  Skill = 14, // 0xE
+}
 
 export type TitleAttributeId =
   | 'sunspear'
@@ -97,10 +123,10 @@ export type SkillTarget = 'Self' | 'Ally' | 'Enemy' | 'Touched' | 'Corpse' | 'Sp
 export interface Gw1Skill {
   id: number;
   name: string;
-  profession: ProfessionId;
-  attribute: AttributeId | null; // null for Common or PvE Title skills
-  titleTrack?: TitleAttributeId;  // non-null for PvE Title skills
-  campaign: CampaignId;
+  profession: Profession;
+  attribute: Attribute | null; // null for Common or PvE Title skills
+  titleTrack?: TitleAttributeId; // non-null for PvE Title skills
+  campaign: Campaign;
   isElite: boolean;
   isPvEOnly: boolean;
   type: SkillType;
@@ -130,8 +156,8 @@ export interface Gw1Skill {
 }
 
 export interface TemplateData {
-  primaryProfession: ProfessionId;
-  secondaryProfession: ProfessionId;
-  attributes: Array<{ attributeId: AttributeId; rank: number }>;
+  primaryProfession: Profession;
+  secondaryProfession: Profession;
+  attributes: Array<{ attributeId: Attribute; rank: number }>;
   skills: [number, number, number, number, number, number, number, number];
 }

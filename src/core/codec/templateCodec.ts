@@ -1,5 +1,5 @@
 import { BitStreamWriter, BitStreamReader } from './bitstream';
-import { ProfessionId, AttributeId, TemplateData } from '../../data/types';
+import { Profession, Attribute, TemplateType, TemplateData } from '../../data/types';
 
 /**
  * Encodes TemplateData into an official Guild Wars 1 Base64 skill template string.
@@ -8,7 +8,7 @@ export function encodeSkillTemplate(data: TemplateData): string {
   const writer = new BitStreamWriter();
 
   // 1. Header: 4 bits template type (14 = 0xE), 4 bits version (0)
-  writer.writeBits(14, 4);
+  writer.writeBits(TemplateType.Skill, 4);
   writer.writeBits(0, 4);
 
   // 2. Professions
@@ -78,8 +78,8 @@ export function decodeSkillTemplate(code: string): TemplateData {
 
   // 1. Header
   const templateType = reader.readBits(4);
-  if (templateType !== 14) {
-    throw new Error(`Unsupported template type: ${templateType}. Expected 14 (0xE).`);
+  if (templateType !== TemplateType.Skill) {
+    throw new Error(`Unsupported template type: ${templateType}. Expected ${TemplateType.Skill} (0xE).`);
   }
   const version = reader.readBits(4);
   if (version !== 0) {
@@ -89,17 +89,17 @@ export function decodeSkillTemplate(code: string): TemplateData {
   // 2. Professions
   const pCode = reader.readBits(2);
   const bitsPerProf = 2 * pCode + 4;
-  const primaryProfession = reader.readBits(bitsPerProf) as ProfessionId;
-  const secondaryProfession = reader.readBits(bitsPerProf) as ProfessionId;
+  const primaryProfession = reader.readBits(bitsPerProf) as Profession;
+  const secondaryProfession = reader.readBits(bitsPerProf) as Profession;
 
   // 3. Attributes
   const attributeCount = reader.readBits(4);
   const aCode = reader.readBits(4);
   const bitsPerAttr = aCode + 4;
 
-  const attributes: Array<{ attributeId: AttributeId; rank: number }> = [];
+  const attributes: Array<{ attributeId: Attribute; rank: number }> = [];
   for (let i = 0; i < attributeCount; i++) {
-    const attributeId = reader.readBits(bitsPerAttr) as AttributeId;
+    const attributeId = reader.readBits(bitsPerAttr) as Attribute;
     const rank = reader.readBits(4);
     attributes.push({ attributeId, rank });
   }

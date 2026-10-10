@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { canAddSkill, validateSkillBar, DEFAULT_SANITY_CONFIG } from './constraints';
-import { Gw1Skill } from '../../data/types';
+import { Gw1Skill, Profession } from '../../data/types';
 
 function createSkill(partial: Partial<Gw1Skill>): Gw1Skill {
   return {
     id: Math.floor(Math.random() * 100000) + 1,
     name: 'Test Skill',
-    profession: 1,
+    profession: Profession.Warrior,
     attribute: 17,
     campaign: 0,
     isElite: false,
@@ -28,18 +28,18 @@ describe('Mechanical Sanity Constraints', () => {
     const pve4 = createSkill({ isPvEOnly: true });
 
     const current = [pve1, pve2, pve3];
-    expect(canAddSkill(current, pve4, DEFAULT_SANITY_CONFIG, 1, 0)).toBe(false);
+    expect(canAddSkill(current, pve4, DEFAULT_SANITY_CONFIG, Profession.Warrior, Profession.None)).toBe(false);
 
     // Non-PvE skill can still be added
     const nonPvE = createSkill({ isPvEOnly: false });
-    expect(canAddSkill(current, nonPvE, DEFAULT_SANITY_CONFIG, 1, 0)).toBe(true);
+    expect(canAddSkill(current, nonPvE, DEFAULT_SANITY_CONFIG, Profession.Warrior, Profession.None)).toBe(true);
   });
 
   it('enforces maximum 1 Elite skill', () => {
     const elite1 = createSkill({ isElite: true });
     const elite2 = createSkill({ isElite: true });
 
-    expect(canAddSkill([elite1], elite2, DEFAULT_SANITY_CONFIG, 1, 0)).toBe(false);
+    expect(canAddSkill([elite1], elite2, DEFAULT_SANITY_CONFIG, Profession.Warrior, Profession.None)).toBe(false);
   });
 
   it('enforces weapon coherence across attack skills', () => {
@@ -48,18 +48,18 @@ describe('Mechanical Sanity Constraints', () => {
     const genericMelee = createSkill({ weaponRequirement: undefined, type: 'Attack' });
 
     // Cannot add Axe attack to a Sword build
-    expect(canAddSkill([swordAttack], axeAttack, DEFAULT_SANITY_CONFIG, 1, 0)).toBe(false);
+    expect(canAddSkill([swordAttack], axeAttack, DEFAULT_SANITY_CONFIG, Profession.Warrior, Profession.None)).toBe(false);
 
     // Generic melee attack can be added
-    expect(canAddSkill([swordAttack], genericMelee, DEFAULT_SANITY_CONFIG, 1, 0)).toBe(true);
+    expect(canAddSkill([swordAttack], genericMelee, DEFAULT_SANITY_CONFIG, Profession.Warrior, Profession.None)).toBe(true);
   });
 
   it('prevents pairing shield skills with two-handed weapons', () => {
     const hammerAttack = createSkill({ weaponRequirement: 'Hammer', type: 'Attack' });
     const shieldStance = createSkill({ isShieldSkill: true, type: 'Stance' });
 
-    expect(canAddSkill([hammerAttack], shieldStance, DEFAULT_SANITY_CONFIG, 1, 0)).toBe(false);
-    expect(canAddSkill([shieldStance], hammerAttack, DEFAULT_SANITY_CONFIG, 1, 0)).toBe(false);
+    expect(canAddSkill([hammerAttack], shieldStance, DEFAULT_SANITY_CONFIG, Profession.Warrior, Profession.None)).toBe(false);
+    expect(canAddSkill([shieldStance], hammerAttack, DEFAULT_SANITY_CONFIG, Profession.Warrior, Profession.None)).toBe(false);
   });
 
   it('enforces Assassin combo sequences', () => {
@@ -69,15 +69,15 @@ describe('Mechanical Sanity Constraints', () => {
 
     // With 7 skills and no Lead, cannot add Offhand (needs 1 slot for Lead)
     const filler = Array.from({ length: 7 }, () => createSkill({}));
-    expect(canAddSkill(filler, offhand, DEFAULT_SANITY_CONFIG, 7, 0)).toBe(false);
+    expect(canAddSkill(filler, offhand, DEFAULT_SANITY_CONFIG, Profession.Assassin, Profession.None)).toBe(false);
 
     // With Lead present, Offhand can be added
     const withLead = [lead, ...filler.slice(0, 6)];
-    expect(canAddSkill(withLead, offhand, DEFAULT_SANITY_CONFIG, 7, 0)).toBe(true);
+    expect(canAddSkill(withLead, offhand, DEFAULT_SANITY_CONFIG, Profession.Assassin, Profession.None)).toBe(true);
 
     // validateSkillBar catches missing predecessors in completed bar
     const incompleteBar = [dual, ...Array.from({ length: 7 }, () => createSkill({}))];
-    const validation = validateSkillBar(incompleteBar, DEFAULT_SANITY_CONFIG, 7, 0);
+    const validation = validateSkillBar(incompleteBar, DEFAULT_SANITY_CONFIG, Profession.Assassin, Profession.None);
     expect(validation.valid).toBe(false);
     expect(validation.errors.some(e => e.includes('Dual attack requires'))).toBe(true);
   });
@@ -88,17 +88,17 @@ describe('Mechanical Sanity Constraints', () => {
 
     // With 7 slots filled and no enabler, cannot pick pet attack
     const filler = Array.from({ length: 7 }, () => createSkill({}));
-    expect(canAddSkill(filler, petAttack, DEFAULT_SANITY_CONFIG, 2, 0)).toBe(false);
+    expect(canAddSkill(filler, petAttack, DEFAULT_SANITY_CONFIG, Profession.Ranger, Profession.None)).toBe(false);
 
     // Completed bar without enabler fails validation
     const barWithoutEnabler = [petAttack, ...filler];
-    const validation = validateSkillBar(barWithoutEnabler, DEFAULT_SANITY_CONFIG, 2, 0);
+    const validation = validateSkillBar(barWithoutEnabler, DEFAULT_SANITY_CONFIG, Profession.Ranger, Profession.None);
     expect(validation.valid).toBe(false);
     expect(validation.errors.some(e => e.includes('pet enabler'))).toBe(true);
 
     // With enabler, passes
     const barWithEnabler = [petAttack, petEnabler, ...Array.from({ length: 6 }, () => createSkill({}))];
-    expect(validateSkillBar(barWithEnabler, DEFAULT_SANITY_CONFIG, 2, 0).valid).toBe(true);
+    expect(validateSkillBar(barWithEnabler, DEFAULT_SANITY_CONFIG, Profession.Ranger, Profession.None).valid).toBe(true);
   });
 
   it('enforces low-energy primary energy restrictions on Warrior', () => {
@@ -107,9 +107,9 @@ describe('Mechanical Sanity Constraints', () => {
     const medEnergy2 = createSkill({ energy: 15, type: 'Spell' });
 
     // 25 energy spell banned on Warrior primary
-    expect(canAddSkill([], highEnergy, DEFAULT_SANITY_CONFIG, 1, 6)).toBe(false);
+    expect(canAddSkill([], highEnergy, DEFAULT_SANITY_CONFIG, Profession.Warrior, Profession.Elementalist)).toBe(false);
 
     // Cap >= 15 energy skills to at most 1 on Warrior
-    expect(canAddSkill([medEnergy1], medEnergy2, DEFAULT_SANITY_CONFIG, 1, 6)).toBe(false);
+    expect(canAddSkill([medEnergy1], medEnergy2, DEFAULT_SANITY_CONFIG, Profession.Warrior, Profession.Elementalist)).toBe(false);
   });
 });

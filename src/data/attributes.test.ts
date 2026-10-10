@@ -9,6 +9,7 @@ import {
   getProfessionAttributes,
 } from './attributes';
 import { PROFESSIONS, isPrimaryAttribute } from './professions';
+import { Profession, Attribute } from './types';
 
 describe('Attribute Costs & Math Invariants', () => {
   it('matches official cumulative costs progression up to Rank 12 = 97', () => {
@@ -54,24 +55,24 @@ describe('Attribute Costs & Math Invariants', () => {
   });
 
   it('maps each profession to its canonical primary attribute', () => {
-    expect(PROFESSIONS[1].primaryAttributeId).toBe(17); // Warrior -> Strength
-    expect(PROFESSIONS[2].primaryAttributeId).toBe(23); // Ranger -> Expertise
-    expect(PROFESSIONS[3].primaryAttributeId).toBe(16); // Monk -> Divine Favor
-    expect(PROFESSIONS[4].primaryAttributeId).toBe(6);  // Necro -> Soul Reaping
-    expect(PROFESSIONS[5].primaryAttributeId).toBe(0);  // Mesmer -> Fast Casting
-    expect(PROFESSIONS[6].primaryAttributeId).toBe(12); // Ele -> Energy Storage
-    expect(PROFESSIONS[7].primaryAttributeId).toBe(35); // Assassin -> Critical Strikes
-    expect(PROFESSIONS[8].primaryAttributeId).toBe(36); // Ritualist -> Spawning Power
-    expect(PROFESSIONS[9].primaryAttributeId).toBe(40); // Paragon -> Leadership
-    expect(PROFESSIONS[10].primaryAttributeId).toBe(44); // Dervish -> Mysticism
+    expect(PROFESSIONS[Profession.Warrior].primaryAttributeId).toBe(Attribute.Strength);
+    expect(PROFESSIONS[Profession.Ranger].primaryAttributeId).toBe(Attribute.Expertise);
+    expect(PROFESSIONS[Profession.Monk].primaryAttributeId).toBe(Attribute.DivineFavor);
+    expect(PROFESSIONS[Profession.Necromancer].primaryAttributeId).toBe(Attribute.SoulReaping);
+    expect(PROFESSIONS[Profession.Mesmer].primaryAttributeId).toBe(Attribute.FastCasting);
+    expect(PROFESSIONS[Profession.Elementalist].primaryAttributeId).toBe(Attribute.EnergyStorage);
+    expect(PROFESSIONS[Profession.Assassin].primaryAttributeId).toBe(Attribute.CriticalStrikes);
+    expect(PROFESSIONS[Profession.Ritualist].primaryAttributeId).toBe(Attribute.SpawningPower);
+    expect(PROFESSIONS[Profession.Paragon].primaryAttributeId).toBe(Attribute.Leadership);
+    expect(PROFESSIONS[Profession.Dervish].primaryAttributeId).toBe(Attribute.Mysticism);
 
-    expect(isPrimaryAttribute(17, 1)).toBe(true);
-    expect(isPrimaryAttribute(18, 1)).toBe(false); // Axe is not primary
-    expect(isPrimaryAttribute(17, 2)).toBe(false); // Strength on Ranger is false
+    expect(isPrimaryAttribute(Attribute.Strength, Profession.Warrior)).toBe(true);
+    expect(isPrimaryAttribute(Attribute.AxeMastery, Profession.Warrior)).toBe(false);
+    expect(isPrimaryAttribute(Attribute.Strength, Profession.Ranger)).toBe(false);
   });
 
   it('retrieves attributes for a given profession', () => {
-    const warriorAttrs = getProfessionAttributes(1);
+    const warriorAttrs = getProfessionAttributes(Profession.Warrior);
     expect(warriorAttrs.map(a => a.name).sort()).toEqual([
       'Axe Mastery',
       'Hammer Mastery',
@@ -80,7 +81,7 @@ describe('Attribute Costs & Math Invariants', () => {
       'Tactics',
     ].sort());
 
-    const necroAttrs = getProfessionAttributes(4);
+    const necroAttrs = getProfessionAttributes(Profession.Necromancer);
     expect(necroAttrs.map(a => a.name).sort()).toEqual([
       'Blood Magic',
       'Curses',

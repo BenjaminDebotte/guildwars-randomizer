@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Gw1Skill } from '../data/types';
+import { Gw1Skill, Profession } from '../data/types';
 import { getProfession } from '../data/professions';
 
 interface SkillIconProps {
@@ -9,18 +9,18 @@ interface SkillIconProps {
 }
 
 // Colors representing GW1 professions
-const PROFESSION_COLORS: Record<number, { bg: string; text: string; border: string }> = {
-  0: { bg: 'bg-stone-800', text: 'text-stone-300', border: 'border-stone-600' }, // Common
-  1: { bg: 'bg-amber-900/60', text: 'text-amber-300', border: 'border-amber-600' }, // Warrior (Warm Orange/Gold)
-  2: { bg: 'bg-emerald-950/70', text: 'text-emerald-300', border: 'border-emerald-600' }, // Ranger (Forest Green)
-  3: { bg: 'bg-sky-950/70', text: 'text-sky-300', border: 'border-sky-500' }, // Monk (Light Blue)
-  4: { bg: 'bg-lime-950/70', text: 'text-lime-300', border: 'border-lime-600' }, // Necro (Poison Green)
-  5: { bg: 'bg-purple-950/70', text: 'text-purple-300', border: 'border-purple-500' }, // Mesmer (Purple)
-  6: { bg: 'bg-red-950/70', text: 'text-red-300', border: 'border-red-600' }, // Ele (Crimson)
-  7: { bg: 'bg-stone-900', text: 'text-stone-200', border: 'border-stone-400' }, // Assassin (Black/Steel)
-  8: { bg: 'bg-cyan-950/70', text: 'text-cyan-300', border: 'border-cyan-600' }, // Rit (Teal)
-  9: { bg: 'bg-yellow-950/70', text: 'text-yellow-300', border: 'border-yellow-500' }, // Paragon (Gold)
-  10: { bg: 'bg-indigo-950/70', text: 'text-indigo-300', border: 'border-indigo-500' }, // Dervish (Midnight Indigo)
+const PROFESSION_COLORS: Record<Profession, { bg: string; text: string; border: string }> = {
+  [Profession.None]: { bg: 'bg-stone-800', text: 'text-stone-300', border: 'border-stone-600' }, // Common
+  [Profession.Warrior]: { bg: 'bg-amber-900/60', text: 'text-amber-300', border: 'border-amber-600' }, // Warrior
+  [Profession.Ranger]: { bg: 'bg-emerald-950/70', text: 'text-emerald-300', border: 'border-emerald-600' }, // Ranger
+  [Profession.Monk]: { bg: 'bg-sky-950/70', text: 'text-sky-300', border: 'border-sky-500' }, // Monk
+  [Profession.Necromancer]: { bg: 'bg-lime-950/70', text: 'text-lime-300', border: 'border-lime-600' }, // Necro
+  [Profession.Mesmer]: { bg: 'bg-purple-950/70', text: 'text-purple-300', border: 'border-purple-500' }, // Mesmer
+  [Profession.Elementalist]: { bg: 'bg-red-950/70', text: 'text-red-300', border: 'border-red-600' }, // Ele
+  [Profession.Assassin]: { bg: 'bg-stone-900', text: 'text-stone-200', border: 'border-stone-400' }, // Assassin
+  [Profession.Ritualist]: { bg: 'bg-cyan-950/70', text: 'text-cyan-300', border: 'border-cyan-600' }, // Rit
+  [Profession.Paragon]: { bg: 'bg-yellow-950/70', text: 'text-yellow-300', border: 'border-yellow-500' }, // Paragon
+  [Profession.Dervish]: { bg: 'bg-indigo-950/70', text: 'text-indigo-300', border: 'border-indigo-500' }, // Dervish
 };
 
 export function SkillIcon({ skill, className = '', size = 56 }: SkillIconProps) {

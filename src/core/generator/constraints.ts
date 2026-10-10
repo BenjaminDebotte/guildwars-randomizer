@@ -1,4 +1,4 @@
-import { Gw1Skill, ProfessionId, WeaponRequirement } from '../../data/types';
+import { Gw1Skill, Profession, WeaponRequirement } from '../../data/types';
 import { PROFESSIONS } from '../../data/professions';
 
 export interface SanityConfig {
@@ -55,8 +55,8 @@ export function canAddSkill(
   currentSkills: Gw1Skill[],
   candidate: Gw1Skill,
   config: SanityConfig,
-  primaryProf: ProfessionId,
-  secProf: ProfessionId
+  primaryProf: Profession,
+  secProf: Profession
 ): boolean {
   // 1. Cannot add duplicates
   if (currentSkills.some(s => s.id === candidate.id)) {
@@ -176,14 +176,14 @@ export function canAddSkill(
 
   // 11. Energy Sanity
   if (config.enforceEnergySanity) {
-    if (primaryProf === 1) { // Warrior (20 max energy, 2 pips)
+    if (primaryProf === Profession.Warrior) { // Warrior (20 max energy, 2 pips)
       if (candidate.energy >= 20) return false;
       if (candidate.energy >= 15) {
         const heavyCount = currentSkills.filter(s => s.energy >= 15).length;
         if (heavyCount >= 1) return false;
       }
       if (candidate.upkeep && candidate.upkeep >= 2) return false;
-    } else if (primaryProf === 2 || primaryProf === 9) { // Ranger or Paragon
+    } else if (primaryProf === Profession.Ranger || primaryProf === Profession.Paragon) {
       if (candidate.energy >= 15) {
         const heavyCount = currentSkills.filter(s => s.energy >= 15).length;
         if (heavyCount >= 2) return false;
@@ -210,8 +210,8 @@ export function canAddSkill(
 export function validateSkillBar(
   skills: Gw1Skill[],
   config: SanityConfig = DEFAULT_SANITY_CONFIG,
-  primaryProf?: ProfessionId,
-  secProf?: ProfessionId
+  primaryProf?: Profession,
+  secProf?: Profession
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
@@ -307,7 +307,7 @@ export function validateSkillBar(
   }
 
   // Energy sanity check
-  if (config.enforceEnergySanity && primaryProf === 1) {
+  if (config.enforceEnergySanity && primaryProf === Profession.Warrior) {
     if (skills.some(s => s.energy >= 20)) {
       errors.push(`Warrior primary cannot sustain skills costing 20 or more energy.`);
     }
