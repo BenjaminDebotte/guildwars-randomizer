@@ -4,17 +4,86 @@ import { Profession, Attribute, Campaign, TemplateData, Gw1Skill } from './data/
 import { generateBuild } from './core/generator/randomizer';
 import { GeneratedBuild } from './core/generator/types';
 import { SanityConfig, DEFAULT_SANITY_CONFIG, CHAOS_SANITY_CONFIG } from './core/generator/constraints';
-import { encodeSkillTemplate } from './core/codec/templateCodec';
+import { encodeSkillTemplate, decodeSkillTemplate } from './core/codec/templateCodec';
 import { getCumulativeCost, MAX_ATTRIBUTE_POINTS } from './data/attributes';
+import { getSkillById } from './data/skills';
 import { SkillBar } from './components/SkillBar';
 import { AttributePanel } from './components/AttributePanel';
 import { FilterPanel, SanityPreset } from './components/FilterPanel';
 import { CodeExportModal } from './components/CodeExportModal';
 
+function parseTemplateFromUrl(): string | null {
+  if (typeof window === 'undefined') return null;
+  const hash = window.location.hash.replace(/^#/, '').trim();
+  if (hash) {
+    const match = hash.match(/(?:template=)?([A-Za-z0-9+/=]+)/);
+    if (match) return match[1];
+  }
+  const searchParams = new URLSearchParams(window.location.search);
+  const templateParam = searchParams.get('template') || searchParams.get('code');
+  if (templateParam) return templateParam.trim();
+  return null;
+}
+
+function buildFromTemplateCode(code: string): GeneratedBuild | null {
+  try {
+    const decoded = decodeSkillTemplate(code);
+    const resolvedSkills: Gw1Skill[] = [];
+    for (const skillId of decoded.skills) {
+      const skill = getSkillById(skillId);
+      if (skill) {
+        resolvedSkills.push(skill);
+      } else {
+        resolvedSkills.push({
+          id: skillId,
+          name: skillId === 0 ? 'Empty Slot' : `Unknown Skill (${skillId})`,
+          profession: Profession.None,
+          attribute: null,
+          campaign: Campaign.Core,
+          isElite: false,
+          isPvEOnly: false,
+          type: 'Skill',
+          energy: 0,
+          activation: 0,
+          recharge: 0,
+          description: '',
+        });
+      }
+    }
+
+    const attributeAllocations = decoded.attributes.map(a => ({
+      attributeId: a.attributeId,
+      rank: a.rank,
+      cost: getCumulativeCost(a.rank),
+    }));
+    const totalUsed = attributeAllocations.reduce((sum, a) => sum + a.cost, 0);
+
+    return {
+      primaryProfession: decoded.primaryProfession,
+      secondaryProfession: decoded.secondaryProfession,
+      skills: resolvedSkills as [Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill],
+      attributeAllocations,
+      totalPointsUsed: totalUsed,
+      remainingPoints: MAX_ATTRIBUTE_POINTS - totalUsed,
+      templateData: decoded,
+      templateCode: encodeSkillTemplate(decoded),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
+  const initialUrlCode = parseTemplateFromUrl();
+  const initialBuildFromUrl = initialUrlCode ? buildFromTemplateCode(initialUrlCode) : null;
+
   // Filter & Configuration State
-  const [primaryProfession, setPrimaryProfession] = useState<Profession | 'random'>('random');
-  const [secondaryProfession, setSecondaryProfession] = useState<Profession | 'random' | 'none'>('random');
+  const [primaryProfession, setPrimaryProfession] = useState<Profession | 'random'>(() =>
+    initialBuildFromUrl ? initialBuildFromUrl.primaryProfession : 'random'
+  );
+  const [secondaryProfession, setSecondaryProfession] = useState<Profession | 'random' | 'none'>(() =>
+    initialBuildFromUrl ? initialBuildFromUrl.secondaryProfession : 'random'
+  );
   const [selectedCampaigns, setSelectedCampaigns] = useState<Campaign[]>([
     Campaign.Core,
     Campaign.Prophecies,
@@ -44,6 +113,7 @@ export default function App() {
 
   // Build State
   const [build, setBuild] = useState<GeneratedBuild>(() =>
+    initialBuildFromUrl ??
     generateBuild({
       primaryProfession: 'random',
       secondaryProfession: 'random',
@@ -137,6 +207,33 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [rollBuild]);
+
+  // Synchronize build template code with URL hash
+  useEffect(() => {
+    if (build.templateCode && typeof window !== 'undefined') {
+      const currentHash = window.location.hash.replace(/^#/, '');
+      if (currentHash !== build.templateCode) {
+        window.history.replaceState(null, '', `#${build.templateCode}`);
+      }
+    }
+  }, [build.templateCode]);
+
+  // Listen to browser navigation / hash change
+  useEffect(() => {
+    const handleHashChange = () => {
+      const code = parseTemplateFromUrl();
+      if (code && code !== build.templateCode) {
+        const parsed = buildFromTemplateCode(code);
+        if (parsed) {
+          setBuild(parsed);
+          setPrimaryProfession(parsed.primaryProfession);
+          setSecondaryProfession(parsed.secondaryProfession);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [build.templateCode]);
 
   // Slot Lock Toggles
   const toggleLock = (idx: number) => {

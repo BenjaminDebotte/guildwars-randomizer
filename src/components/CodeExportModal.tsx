@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Copy, Check, ArrowDownToLine, X, AlertCircle } from 'lucide-react';
+import { Copy, Check, ArrowDownToLine, X, AlertCircle, Link } from 'lucide-react';
 import { decodeSkillTemplate } from '../core/codec/templateCodec';
 import { getSkillById } from '../data/skills';
-import { TemplateData, Gw1Skill } from '../data/types';
+import { TemplateData, Gw1Skill, Profession, Campaign } from '../data/types';
 
 interface CodeExportModalProps {
   isOpen: boolean;
@@ -21,6 +21,7 @@ export function CodeExportModal({
   onImportBuild,
 }: CodeExportModalProps) {
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [importInput, setImportInput] = useState('');
   const [importError, setImportError] = useState<string | null>(null);
 
@@ -40,6 +41,17 @@ export function CodeExportModal({
       await navigator.clipboard.writeText(templateCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      const shareUrl = `${window.location.origin}${window.location.pathname}#${templateCode}`;
+      await navigator.clipboard.writeText(shareUrl);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
     } catch {
       // Fallback
     }
@@ -66,9 +78,9 @@ export function CodeExportModal({
           resolvedSkills.push({
             id: skillId,
             name: skillId === 0 ? 'Empty Slot' : `Unknown Skill (${skillId})`,
-            profession: 0,
+            profession: Profession.None,
             attribute: null,
-            campaign: 0,
+            campaign: Campaign.Core,
             isElite: false,
             isPvEOnly: false,
             type: 'Skill',
@@ -134,14 +146,27 @@ export function CodeExportModal({
             <button
               type="button"
               onClick={handleCopy}
-              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-lg font-semibold text-xs transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-2.5 rounded-lg font-semibold text-xs transition-all ${
                 copied
                   ? 'bg-emerald-600 text-white'
                   : 'bg-amber-600 hover:bg-amber-500 text-stone-950'
               }`}
             >
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              {copied ? 'Copied!' : 'Copy'}
+              {copied ? 'Copied' : 'Copy'}
+            </button>
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              title="Copy direct link to build"
+              className={`flex items-center gap-1.5 px-3 py-2.5 rounded-lg font-semibold text-xs transition-all ${
+                linkCopied
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700'
+              }`}
+            >
+              {linkCopied ? <Check className="w-4 h-4" /> : <Link className="w-4 h-4" />}
+              {linkCopied ? 'Link Copied' : 'Share Link'}
             </button>
           </div>
           <p className="text-[11px] text-stone-500 mt-1.5">
