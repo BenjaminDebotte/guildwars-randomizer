@@ -56,12 +56,20 @@ export class BitStreamReader {
 
   constructor(base64Str: string) {
     let candidate = base64Str.trim();
-    // If enclosed in brackets like [Skill template code: XYZ], extract the template code
-    const bracketMatch = candidate.match(/\[.*?(?:code:\s*)?([A-Za-z0-9+/=]{10,})\s*\]/is);
+
+    // If enclosed in brackets like [Skill template code: XYZ] or [Name;XYZ], extract the code
+    const bracketMatch = candidate.match(/\[.*?(?:[:;]\s*)?([A-Za-z0-9+/]{10,})\s*\]/is);
     if (bracketMatch && bracketMatch[1]) {
       candidate = bracketMatch[1];
     }
-    const cleanStr = candidate.replace(/[^A-Za-z0-9+/]/g, '');
+
+    // If candidate has a semicolon (GW1 chat format: Name;Code), extract after the last semicolon
+    if (candidate.includes(';')) {
+      candidate = candidate.slice(candidate.lastIndexOf(';') + 1).trim();
+    }
+
+    // Strip optional trailing Base64 padding '=' or whitespace
+    const cleanStr = candidate.replace(/[\s=]/g, '');
 
     for (let i = 0; i < cleanStr.length; i++) {
       const char = cleanStr[i];

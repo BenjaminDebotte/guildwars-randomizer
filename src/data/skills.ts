@@ -34,7 +34,7 @@ export function getAvailableSkills(options: {
     // Can equip Primary profession skills, Secondary profession skills, or Common (profession 0) skills
     if (skill.profession === primaryProfession) return true;
     if (secondaryProfession !== 0 && skill.profession === secondaryProfession) return true;
-    if (skill.profession === 0 && includePvE) return true;
+    if (skill.profession === 0) return true;
 
     return false;
   });

@@ -73,10 +73,11 @@ export function FilterPanel({
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 mb-4">
         {/* Primary Profession Dropdown */}
         <div>
-          <label className="block text-xs font-semibold text-stone-400 mb-1">
+          <label htmlFor="primary-prof-select" className="block text-xs font-semibold text-stone-400 mb-1">
             Primary Profession
           </label>
           <select
+            id="primary-prof-select"
             value={primaryProfession}
             onChange={e => {
               const val = e.target.value === 'random' ? 'random' : (Number(e.target.value) as ProfessionId);
@@ -95,10 +96,11 @@ export function FilterPanel({
 
         {/* Secondary Profession Dropdown */}
         <div>
-          <label className="block text-xs font-semibold text-stone-400 mb-1">
+          <label htmlFor="secondary-prof-select" className="block text-xs font-semibold text-stone-400 mb-1">
             Secondary Profession
           </label>
           <select
+            id="secondary-prof-select"
             value={secondaryProfession}
             onChange={e => {
               const val = e.target.value === 'random'
@@ -126,10 +128,11 @@ export function FilterPanel({
 
         {/* Elite Skill Preference */}
         <div>
-          <label className="block text-xs font-semibold text-stone-400 mb-1">
+          <label htmlFor="elite-preference-select" className="block text-xs font-semibold text-stone-400 mb-1">
             Elite Skill
           </label>
           <select
+            id="elite-preference-select"
             value={lockedElite}
             onChange={e => onLockedEliteChange(e.target.value as 'any' | 'none')}
             className="w-full bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-amber-500"
@@ -141,10 +144,11 @@ export function FilterPanel({
 
         {/* Sanity Preset */}
         <div>
-          <label className="block text-xs font-semibold text-stone-400 mb-1">
+          <label htmlFor="sanity-preset-select" className="block text-xs font-semibold text-stone-400 mb-1">
             Sanity Mode
           </label>
           <select
+            id="sanity-preset-select"
             value={sanityPreset}
             onChange={e => onSanityPresetChange(e.target.value as SanityPreset)}
             className="w-full bg-stone-950 border border-stone-800 rounded-lg p-2 text-xs text-stone-200 focus:outline-none focus:border-amber-500 font-medium"

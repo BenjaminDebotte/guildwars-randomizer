@@ -41,10 +41,10 @@ export function generateBuild(options: RandomizerOptions = {}): GeneratedBuild {
 
   // 2. Resolve Secondary Profession
   let secProf: ProfessionId;
-  if (options.secondaryProfession === 'none') {
+  if (options.secondaryProfession === 'none' || options.secondaryProfession === 0) {
     secProf = 0;
   } else if (
-    options.secondaryProfession &&
+    options.secondaryProfession !== undefined &&
     options.secondaryProfession !== 'random' &&
     options.secondaryProfession !== primaryProf
   ) {
@@ -56,12 +56,22 @@ export function generateBuild(options: RandomizerOptions = {}): GeneratedBuild {
   }
 
   // 3. Obtain skill pool
-  const rawPool = getAvailableSkills({
+  let rawPool = getAvailableSkills({
     primaryProfession: primaryProf,
     secondaryProfession: secProf,
     campaigns: options.campaigns,
     includePvE: options.includePvE ?? true,
   });
+
+  // Guard against impossible campaign/profession filters (e.g. Paragon with only Prophecies)
+  if (rawPool.length < 8) {
+    rawPool = getAvailableSkills({
+      primaryProfession: primaryProf,
+      secondaryProfession: secProf,
+      campaigns: undefined,
+      includePvE: true,
+    });
+  }
 
   // 4. Handle locked skills and locked slots
   const slots: Array<Gw1Skill | null> = [null, null, null, null, null, null, null, null];

@@ -56,7 +56,7 @@ export function AttributePanel({
           No attributes currently allocated.
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-2.5">
           {allocations.map(alloc => {
             const attr = getAttribute(alloc.attributeId);
             const attrName = attr?.name ?? `Attribute ${alloc.attributeId}`;
@@ -96,6 +96,7 @@ export function AttributePanel({
                     type="button"
                     disabled={!canDecrement}
                     onClick={() => onUpdateRank(alloc.attributeId, alloc.rank - 1)}
+                    aria-label={`Decrease ${attrName} rank`}
                     className="p-1 rounded bg-stone-800 hover:bg-stone-700 disabled:opacity-30 disabled:cursor-not-allowed text-stone-300 transition-colors"
                     title="Decrease rank"
                   >
@@ -110,6 +111,7 @@ export function AttributePanel({
                     type="button"
                     disabled={!canIncrement}
                     onClick={() => onUpdateRank(alloc.attributeId, alloc.rank + 1)}
+                    aria-label={`Increase ${attrName} rank`}
                     className="p-1 rounded bg-stone-800 hover:bg-stone-700 disabled:opacity-30 disabled:cursor-not-allowed text-stone-300 transition-colors"
                     title={canIncrement ? `Increase rank (costs ${nextCost} AP)` : 'Cannot afford or max rank'}
                   >

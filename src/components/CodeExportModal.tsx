@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Copy, Check, ArrowDownToLine, X, AlertCircle } from 'lucide-react';
 import { decodeSkillTemplate } from '../core/codec/templateCodec';
 import { getSkillById } from '../data/skills';
@@ -23,6 +23,15 @@ export function CodeExportModal({
   const [copied, setCopied] = useState(false);
   const [importInput, setImportInput] = useState('');
   const [importError, setImportError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -85,18 +94,24 @@ export function CodeExportModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-150">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+    >
       <div className="relative w-full max-w-lg bg-stone-900 border border-stone-700 rounded-xl shadow-2xl p-5 text-stone-200">
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
+          aria-label="Close template modal"
           className="absolute top-4 right-4 p-1 rounded-lg text-stone-400 hover:text-stone-200 hover:bg-stone-800 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <h3 className="text-lg font-bold text-amber-500 mb-1">
+        <h3 id="modal-title" className="text-lg font-bold text-amber-500 mb-1">
           In-Game Template Code
         </h3>
         <p className="text-xs text-stone-400 mb-4">

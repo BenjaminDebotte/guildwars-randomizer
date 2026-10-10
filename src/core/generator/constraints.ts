@@ -46,7 +46,7 @@ export const CHAOS_SANITY_CONFIG: SanityConfig = {
   maxAttributes: null,
 };
 
-const TWO_HANDED_WEAPONS: Set<WeaponRequirement> = new Set(['Hammer', 'Scythe', 'Bow', 'Staff']);
+const TWO_HANDED_WEAPONS: Set<WeaponRequirement> = new Set(['Hammer', 'Scythe', 'Bow', 'Staff', 'Dagger']);
 
 /**
  * Checks if a candidate skill can be legally and constructively added to the current bar.
@@ -210,8 +210,8 @@ export function canAddSkill(
 export function validateSkillBar(
   skills: Gw1Skill[],
   config: SanityConfig = DEFAULT_SANITY_CONFIG,
-  _primaryProf?: ProfessionId,
-  _secProf?: ProfessionId
+  primaryProf?: ProfessionId,
+  secProf?: ProfessionId
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
@@ -291,6 +291,26 @@ export function validateSkillBar(
   const forms = skills.filter(s => s.isForm || s.type === 'Form').length;
   if (forms > (config.maxForms ?? 1)) {
     errors.push(`Maximum ${config.maxForms ?? 1} transformation forms exceeded (found ${forms}).`);
+  }
+
+  const weaponSpells = skills.filter(s => s.type === 'WeaponSpell').length;
+  if (weaponSpells > (config.maxWeaponSpells ?? 2)) {
+    errors.push(`Maximum ${config.maxWeaponSpells ?? 2} weapon spells exceeded (found ${weaponSpells}).`);
+  }
+
+  // Secondary primary attribute check
+  if (secProf && primaryProf && secProf !== primaryProf) {
+    const secPrimaryAttr = PROFESSIONS[secProf]?.primaryAttributeId;
+    if (secPrimaryAttr !== null && skills.some(s => s.profession === secProf && s.attribute === secPrimaryAttr)) {
+      errors.push(`Cannot equip skills scaling with secondary profession's primary attribute.`);
+    }
+  }
+
+  // Energy sanity check
+  if (config.enforceEnergySanity && primaryProf === 1) {
+    if (skills.some(s => s.energy >= 20)) {
+      errors.push(`Warrior primary cannot sustain skills costing 20 or more energy.`);
+    }
   }
 
   return {

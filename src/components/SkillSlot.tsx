@@ -35,7 +35,8 @@ export function SkillSlot({
     >
       {/* Skill Card Frame */}
       <div
-        className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-md p-0.5 transition-all duration-150 shadow-md ${
+        onClick={() => setIsHovered(prev => !prev)}
+        className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-md p-0.5 transition-all duration-150 shadow-md cursor-pointer ${
           isElite
             ? 'bg-gradient-to-b from-amber-400 via-amber-600 to-amber-800 ring-2 ring-amber-400/90 shadow-amber-900/50'
             : 'bg-stone-800 border border-stone-600/80 hover:border-stone-400'
@@ -90,9 +91,17 @@ export function SkillSlot({
         </button>
       </div>
 
-      {/* Hover Tooltip Popup */}
+      {/* Hover/Tap Tooltip Popup */}
       {isHovered && skill && (
-        <div className="absolute bottom-full mb-2 z-50 pointer-events-none transform -translate-x-1/2 left-1/2">
+        <div
+          className={`absolute bottom-full mb-2 z-50 pointer-events-none ${
+            slotIndex <= 1
+              ? 'left-0 translate-x-0'
+              : slotIndex >= 6
+              ? 'right-0 translate-x-0'
+              : 'left-1/2 -translate-x-1/2'
+          }`}
+        >
           <SkillTooltip skill={skill} />
         </div>
       )}

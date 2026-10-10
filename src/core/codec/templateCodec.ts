@@ -26,6 +26,9 @@ export function encodeSkillTemplate(data: TemplateData): string {
   // 3. Attributes
   // Only non-zero attributes are encoded to save bits and adhere to the spec
   const activeAttributes = data.attributes.filter(a => a.rank > 0);
+  if (activeAttributes.length > 15) {
+    throw new Error(`Cannot encode more than 15 active attributes (received ${activeAttributes.length}).`);
+  }
   const maxAttrId = activeAttributes.length > 0
     ? Math.max(...activeAttributes.map(a => a.attributeId))
     : 0;
@@ -41,7 +44,7 @@ export function encodeSkillTemplate(data: TemplateData): string {
 
   for (const attr of activeAttributes) {
     writer.writeBits(attr.attributeId, bitsPerAttr);
-    writer.writeBits(attr.rank, 4);
+    writer.writeBits(Math.min(15, Math.max(0, attr.rank)), 4);
   }
 
   // 4. Skills (8 skills)
@@ -67,6 +70,11 @@ export function encodeSkillTemplate(data: TemplateData): string {
  */
 export function decodeSkillTemplate(code: string): TemplateData {
   const reader = new BitStreamReader(code);
+
+  // Minimum required bits for a valid template with 0 attributes is ~95 bits (~16 Base64 chars)
+  if (reader.remainingBits() < 90) {
+    throw new Error('Template code is too short or truncated.');
+  }
 
   // 1. Header
   const templateType = reader.readBits(4);

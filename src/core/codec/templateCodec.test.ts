@@ -107,4 +107,40 @@ describe('Skill Template Codec', () => {
     expect(decoded.attributes.length).toBe(2);
     expect(decoded.attributes.find(a => a.attributeId === 24)).toBeUndefined();
   });
+
+  it('re-encodes to exact canonical string matching official wiki code', () => {
+    const code = 'OwFj0xfzITOMMMHMie4O0kxZ6PA';
+    const decoded = decodeSkillTemplate(code);
+    const reEncoded = encodeSkillTemplate(decoded);
+    expect(reEncoded).toBe(code);
+  });
+
+  it('correctly handles chat link format with semicolons', () => {
+    const code = 'OwFj0xfzITOMMMHMie4O0kxZ6PA';
+    const chatLink = `[Dagger Spam;${code}]`;
+    const decoded = decodeSkillTemplate(chatLink);
+    expect(decoded.primaryProfession).toBe(7);
+
+    const unbracketed = `Dagger Spam;${code}`;
+    const decoded2 = decodeSkillTemplate(unbracketed);
+    expect(decoded2.primaryProfession).toBe(7);
+  });
+
+  it('rejects truncated template codes', () => {
+    expect(() => decodeSkillTemplate('Ow')).toThrow('Template code is too short or truncated.');
+  });
+
+  it('rejects invalid Base64 characters', () => {
+    expect(() => decodeSkillTemplate('OwFj0xfzITOMMMHMie4O0kxZ6PA!@#')).toThrow('Invalid Base64 character');
+  });
+
+  it('rejects encoding more than 15 attributes', () => {
+    const excessiveAttrs: TemplateData = {
+      primaryProfession: 1,
+      secondaryProfession: 2,
+      attributes: Array.from({ length: 16 }, (_, i) => ({ attributeId: i as any, rank: 1 })),
+      skills: [1, 2, 3, 4, 5, 6, 7, 8],
+    };
+    expect(() => encodeSkillTemplate(excessiveAttrs)).toThrow('Cannot encode more than 15 active attributes');
+  });
 });

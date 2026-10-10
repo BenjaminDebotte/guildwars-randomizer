@@ -136,8 +136,8 @@ function mapTitleTrack(attributeId: number): TitleAttributeId | undefined {
   switch (attributeId) {
     case 102: return 'sunspear';
     case 103: return 'lightbringer';
-    case 104: return 'kurzick';
-    case 105: return 'luxon';
+    case 104: return 'luxon';
+    case 105: return 'kurzick';
     case 106: return 'asura';
     case 107: return 'deldrimor';
     case 108: return 'ebon_vanguard';
@@ -145,6 +145,8 @@ function mapTitleTrack(attributeId: number): TitleAttributeId | undefined {
     default: return undefined;
   }
 }
+
+const NORN_BLESSINGS = new Set(['Ursan Blessing', 'Volfen Blessing', 'Raven Blessing']);
 
 const PET_COMMAND_NAMES = new Set([
   'Revive Animal',
@@ -176,11 +178,13 @@ for (let i = 1; i <= 4000; i++) {
     const isForm =
       typeId === Type.FORM ||
       name.startsWith('Avatar of ') ||
-      name.endsWith(' Blessing') ||
+      NORN_BLESSINGS.has(name) ||
       /transformed into/i.test(desc);
 
     const isTeardown =
+      a.profession === 10 &&
       !isForm &&
+      !/from target foe|from foes|from knocked-down foes|whenever you lose/i.test(desc) &&
       /(lose|remove|removes)\s+(1\s+|a\s+|one\s+of\s+your\s+)?(Dervish\s+)?enchantment/i.test(desc);
 
     const isFlashEnchantment =

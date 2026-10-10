@@ -93,6 +93,7 @@ export default function App() {
       primaryProfession: build.primaryProfession,
       secondaryProfession: build.secondaryProfession,
       lockedSlots: lockedList,
+      lockedEliteId: lockedElite === 'none' ? 'none' : undefined,
       campaigns: selectedCampaigns,
       includePvE,
       sanityConfig: activeSanityConfig,
@@ -104,9 +105,14 @@ export default function App() {
   // Keyboard shortcut listener (Space or 'R' to roll)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input or textarea
+      // Ignore if user is typing in an input, textarea, select, or focused on a button
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.tagName === 'BUTTON'
+      ) {
         return;
       }
 
@@ -190,13 +196,25 @@ export default function App() {
     templateData: TemplateData;
     skills: [Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill];
   }) => {
-    const newBuild = generateBuild({
+    const attributeAllocations = data.templateData.attributes.map(a => ({
+      attributeId: a.attributeId,
+      rank: a.rank,
+      cost: getCumulativeCost(a.rank),
+    }));
+    const totalUsed = attributeAllocations.reduce((sum, a) => sum + a.cost, 0);
+
+    const importedBuild: GeneratedBuild = {
       primaryProfession: data.templateData.primaryProfession,
       secondaryProfession: data.templateData.secondaryProfession,
-      lockedSlots: data.skills.map((s, idx) => ({ index: idx, skillId: s.id })),
-      sanityConfig: activeSanityConfig,
-    });
-    setBuild(newBuild);
+      skills: data.skills,
+      attributeAllocations,
+      totalPointsUsed: totalUsed,
+      remainingPoints: MAX_ATTRIBUTE_POINTS - totalUsed,
+      templateData: data.templateData,
+      templateCode: encodeSkillTemplate(data.templateData),
+    };
+
+    setBuild(importedBuild);
     setPrimaryProfession(data.templateData.primaryProfession);
     setSecondaryProfession(data.templateData.secondaryProfession);
   };

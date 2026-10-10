@@ -87,7 +87,7 @@ describe('Skill Database Integrity', () => {
     });
 
     for (const skill of warriorMonkSkills) {
-      expect([1, 3]).toContain(skill.profession);
+      expect([0, 1, 3]).toContain(skill.profession);
       expect(skill.isPvEOnly).toBe(false);
     }
 
@@ -100,5 +100,32 @@ describe('Skill Database Integrity', () => {
 
     const hasCommon = withPvE.some(s => s.profession === 0);
     expect(hasCommon).toBe(true);
+
+    // Resurrection Signet is PvP legal (common skill available even with includePvE: false)
+    const withoutPvE = getAvailableSkills({
+      primaryProfession: 1,
+      secondaryProfession: 3,
+      includePvE: false,
+    });
+    expect(withoutPvE.some(s => s.id === 2)).toBe(true);
+  });
+
+  it('correctly tags specific mechanics without false positives', () => {
+    // Vital Blessing (Monk, ID 289) must NOT be a Form
+    const vitalBlessing = getSkillById(289);
+    expect(vitalBlessing).toBeDefined();
+    expect(vitalBlessing?.isForm).toBeUndefined();
+
+    // Rend Enchantments (Necro, ID 141) must NOT be a Teardown
+    const rendEnch = getSkillById(141);
+    expect(rendEnch).toBeDefined();
+    expect(rendEnch?.isTeardown).toBeUndefined();
+
+    // Luxon vs Kurzick title mapping
+    const saveYourselvesLuxon = getSkillById(1954);
+    expect(saveYourselvesLuxon?.titleTrack).toBe('luxon');
+
+    const etherNightmareKurzick = getSkillById(2092);
+    expect(etherNightmareKurzick?.titleTrack).toBe('kurzick');
   });
 });

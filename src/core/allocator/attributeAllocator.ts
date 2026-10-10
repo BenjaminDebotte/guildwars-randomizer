@@ -33,7 +33,7 @@ const DEFAULT_UTILITY_ATTRIBUTES: Record<ProfessionId, AttributeId> = {
   3: 15,  // Monk -> Protection Prayers
   4: 7,   // Necromancer -> Curses
   5: 3,   // Mesmer -> Inspiration Magic
-  6: 12,  // Elementalist -> Energy Storage
+  6: 8,   // Elementalist -> Air Magic (distinct from primary Energy Storage 12)
   7: 31,  // Assassin -> Shadow Arts
   8: 32,  // Ritualist -> Communing
   9: 38,  // Paragon -> Command
@@ -86,7 +86,7 @@ export function allocateAttributePoints(options: AllocateOptions): AllocationRes
   }
 
   const defaultUtility = DEFAULT_UTILITY_ATTRIBUTES[primaryProfession];
-  if (activeAttrIds.length < 3 && defaultUtility && !activeAttrIds.includes(defaultUtility)) {
+  if (activeAttrIds.length < 2 && defaultUtility && !activeAttrIds.includes(defaultUtility)) {
     activeAttrIds.push(defaultUtility);
   }
 
@@ -113,12 +113,15 @@ export function allocateAttributePoints(options: AllocateOptions): AllocationRes
     ranks.set(attr2, 12);
     remainingBudget -= (97 + 97);
 
-    // If 6 points remain, buy rank 3 (costs 6 pts) on 3rd utility attribute if available
-    if (defaultUtility && !activeAttrIds.includes(defaultUtility)) {
-      ranks.set(defaultUtility, 3);
+    // If 6 points remain, buy rank 3 (costs 6 pts) on a 3rd utility attribute
+    const fallback3rd = Object.values(ATTRIBUTES).find(
+      a => a.professionId === primaryProfession && !ranks.has(a.id)
+    )?.id;
+    if (fallback3rd !== undefined) {
+      ranks.set(fallback3rd, 3);
       remainingBudget -= 6;
     }
-  } else if (activeAttrIds.length >= 3 && attr1 !== undefined && attr2 !== undefined && attr3 !== undefined) {
+  } else if (activeAttrIds.length === 3 && attr1 !== undefined && attr2 !== undefined && attr3 !== undefined) {
     // Choose between 12/10/8 (195 pts) and 12/9/9 (193 pts)
     if (count1 >= 4 && count2 >= 2 && count3 <= 1) {
       // 12 / 10 / 8 spread: 97 + 61 + 37 = 195 pts (leaves 5 pts)

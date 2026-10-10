@@ -4255,7 +4255,6 @@
     "recharge": 2,
     "description": "While you maintain this enchantment, target ally has +40...200 maximum Health.",
     "upkeep": -1,
-    "isForm": true,
     "conciseDescription": "+40...200 maximum Health."
   },
   {
@@ -9552,7 +9551,6 @@
     "activation": 1,
     "recharge": 15,
     "description": "Remove 1 enchantment from target foe. If an enchantment was removed, that foe suffers from Bleeding for 5...25 seconds.",
-    "isTeardown": true,
     "conciseDescription": "Removes 1 enchantment. Removal effect: inflicts Bleeding (5...25 seconds)."
   },
   {
@@ -17135,7 +17133,6 @@
     "activation": 0,
     "recharge": 10,
     "description": "When you cast this enchantment, all nearby foes take 10...40 cold damage. For 30 <sic/> seconds, your attack skills remove enchantments from knocked-down foes. When this enchantment ends, nearby foes are affected by Cracked Armor for 1...10 second[s].",
-    "isTeardown": true,
     "isFlashEnchantment": true,
     "conciseDescription": "(30 seconds.) Your attack skills remove enchantments from knocked-down foes. Initial effect: deals 10...40 cold damage to all nearby foes. End effect: nearby foes have Cracked Armor for 1...10 second[s]."
   },
@@ -17493,7 +17490,7 @@
     "activation": 0.25,
     "recharge": 30,
     "description": "You are Blinded for 5 seconds. For 10 seconds, you gain +7...10 Health regeneration and +40 armor.",
-    "titleTrack": "kurzick",
+    "titleTrack": "luxon",
     "conciseDescription": "(10 seconds.) You gain +7...10 Health regeneration and +40 armor. <gray>You are Blind (5 seconds).</gray>"
   },
   {
@@ -17509,7 +17506,7 @@
     "activation": 3,
     "recharge": 25,
     "description": "Target foe loses 5...8 Energy. For each point of Energy lost in this way, that foe and all foes in the area suffer -1 Health degeneration for 10 seconds.",
-    "titleTrack": "kurzick",
+    "titleTrack": "luxon",
     "conciseDescription": "Causes 5...8 Energy loss. Target and foes in the area have -1 Health degeneration for each point of Energy lost (10 seconds)."
   },
   {
@@ -17525,7 +17522,7 @@
     "activation": 1,
     "recharge": 20,
     "description": "Target foe and all nearby foes take 20...30 damage. For each affected foe suffering from a condition or hex, you gain 2 Energy (maximum 12...20 Energy).",
-    "titleTrack": "kurzick",
+    "titleTrack": "luxon",
     "conciseDescription": "Deals 20...30 damage to target and nearby foes. You gain 2 Energy (maximum 12...20) for each of these foes with a condition or hex."
   },
   {
@@ -17541,7 +17538,7 @@
     "activation": 0.25,
     "recharge": 45,
     "description": "For 40...60 seconds, your elemental attributes are boosted by 1. Each time you cast a spell, you gain 1 Energy for every 10 ranks of Energy Storage and are healed for 100...300% of the spell's Energy cost.",
-    "titleTrack": "kurzick",
+    "titleTrack": "luxon",
     "conciseDescription": "(40...60 seconds.) Your elemental attributes are boosted by 1. Each time you cast a spell, you gain 1 energy for every 10 ranks of Energy Storage and are healed for 100...300% of the spell's Energy cost."
   },
   {
@@ -17557,7 +17554,7 @@
     "activation": 0.25,
     "recharge": 45,
     "description": "For 15...20 seconds, spells you cast that target another ally cost 3 less energy.",
-    "titleTrack": "kurzick",
+    "titleTrack": "luxon",
     "conciseDescription": "(15...20 seconds.) Spells you cast that target another ally cost 3 less Energy."
   },
   {
@@ -17573,7 +17570,7 @@
     "activation": 0,
     "recharge": 10,
     "description": "Shoot 3 arrows simultaneously at target foe. These arrows deal 40...25% less damage.",
-    "titleTrack": "kurzick",
+    "titleTrack": "luxon",
     "weaponRequirement": "Bow",
     "conciseDescription": "Shoot 3 arrows simultaneously at target foe. <gray>These arrows deal 40...25% less damage</gray>"
   },
@@ -17590,7 +17587,7 @@
     "activation": 0,
     "recharge": 0,
     "description": "For 4...6 seconds, all other party members gain +100 armor.",
-    "titleTrack": "kurzick",
+    "titleTrack": "luxon",
     "adrenaline": 8,
     "conciseDescription": "(4...6 seconds.) All other party members gain +100 armor."
   },
@@ -17607,8 +17604,7 @@
     "activation": 0.75,
     "recharge": 30,
     "description": "For 45 seconds, you deal 20...25 holy damage to all adjacent foes whenever you lose a Dervish enchantment.",
-    "titleTrack": "kurzick",
-    "isTeardown": true,
+    "titleTrack": "luxon",
     "conciseDescription": "(45 seconds.) Whenever you lose a Dervish enchantment, adjacent foes take 20...25 holy damage."
   },
   {
@@ -17624,7 +17620,7 @@
     "activation": 1,
     "recharge": 8,
     "description": "This attack deals +30...40 damage. If this attack hits a foe suffering from a condition, you gain 3...6 strikes of adrenaline.",
-    "titleTrack": "kurzick",
+    "titleTrack": "luxon",
     "weaponRequirement": "Spear",
     "conciseDescription": "Deals +30...40 damage. Gain 3...6 strikes of adrenaline if you hit a foe with a condition."
   },
@@ -18140,7 +18136,7 @@
     "activation": 0.25,
     "recharge": 5,
     "description": "All spirits you control Shadow Step to your location, and gain 60...100 Health.",
-    "titleTrack": "kurzick",
+    "titleTrack": "luxon",
     "conciseDescription": "Spirits you control Shadow Step to your location and gain 60...100 Health."
   },
   {
@@ -18522,7 +18518,7 @@
     "activation": 0.25,
     "recharge": 30,
     "description": "You are Blinded for 5 seconds. For 10 seconds, you gain +7...10 Health regeneration and +40 armor.",
-    "titleTrack": "luxon",
+    "titleTrack": "kurzick",
     "conciseDescription": "(10 seconds.) You gain +7...10 Health regeneration and +40 armor. <gray>You are Blind (5 seconds).</gray>"
   },
   {
@@ -18538,7 +18534,7 @@
     "activation": 3,
     "recharge": 25,
     "description": "Target foe loses 5...8 Energy. For each point of Energy lost in this way, that foe and all foes in the area suffer -1 Health degeneration for 10 seconds.",
-    "titleTrack": "luxon",
+    "titleTrack": "kurzick",
     "conciseDescription": "Causes 5...8 Energy loss. Target and foes in the area have -1 Health degeneration for each point of Energy lost (10 seconds)."
   },
   {
@@ -18554,7 +18550,7 @@
     "activation": 1,
     "recharge": 20,
     "description": "Target foe and all nearby foes take 20...30 damage. For each affected foe suffering from a condition or hex, you gain 2 Energy (maximum 12...20 Energy).",
-    "titleTrack": "luxon",
+    "titleTrack": "kurzick",
     "conciseDescription": "Deals 20...30 damage to target and nearby foes. You gain 2 Energy (maximum 12...20) for each of these foes with a condition or hex."
   },
   {
@@ -18570,7 +18566,7 @@
     "activation": 0.25,
     "recharge": 45,
     "description": "For 40...60 seconds, your elemental attributes are boosted by 1. Each time you cast a spell, you gain 1 Energy for every 10 ranks of Energy Storage and are healed for 100...300% of the spell's Energy cost.",
-    "titleTrack": "luxon",
+    "titleTrack": "kurzick",
     "conciseDescription": "(40...60 seconds.) Your elemental attributes are boosted by 1. Each time you cast a spell, you gain 1 energy for every 10 ranks of Energy Storage and are healed for 100...300% of the spell's Energy cost."
   },
   {
@@ -18586,7 +18582,7 @@
     "activation": 0.25,
     "recharge": 45,
     "description": "For 15...20 seconds, spells you cast that target another ally cost 3 less energy.",
-    "titleTrack": "luxon",
+    "titleTrack": "kurzick",
     "conciseDescription": "(15...20 seconds.) Spells you cast that target another ally cost 3 less Energy."
   },
   {
@@ -18602,7 +18598,7 @@
     "activation": 0,
     "recharge": 10,
     "description": "Shoot 3 arrows simultaneously at target foe. These arrows deal 40...25% less damage.",
-    "titleTrack": "luxon",
+    "titleTrack": "kurzick",
     "weaponRequirement": "Bow",
     "conciseDescription": "Shoot 3 arrows simultaneously at target foe. <gray>These arrows deal 40...25% less damage</gray>"
   },
@@ -18619,7 +18615,7 @@
     "activation": 0,
     "recharge": 0,
     "description": "For 4...6 seconds, all other party members gain +100 armor.",
-    "titleTrack": "luxon",
+    "titleTrack": "kurzick",
     "adrenaline": 8,
     "conciseDescription": "(4...6 seconds.) All other party members gain +100 armor."
   },
@@ -18636,8 +18632,7 @@
     "activation": 0.75,
     "recharge": 30,
     "description": "For 45 seconds, you deal 20...25 holy damage to all adjacent foes whenever you lose a Dervish enchantment.",
-    "titleTrack": "luxon",
-    "isTeardown": true,
+    "titleTrack": "kurzick",
     "conciseDescription": "(45 seconds.) Whenever you lose a Dervish enchantment, adjacent foes take 20...25 holy damage."
   },
   {
@@ -18653,7 +18648,7 @@
     "activation": 1,
     "recharge": 8,
     "description": "This attack deals +30...40 damage. If this attack hits a foe suffering from a condition, you gain 3...6 strikes of adrenaline.",
-    "titleTrack": "luxon",
+    "titleTrack": "kurzick",
     "weaponRequirement": "Spear",
     "conciseDescription": "Deals +30...40 damage. Gain 3...6 strikes of adrenaline if you hit a foe with a condition."
   },
@@ -18670,7 +18665,7 @@
     "activation": 0.25,
     "recharge": 5,
     "description": "All spirits you control Shadow Step to your location, and gain 60...100 Health.",
-    "titleTrack": "luxon",
+    "titleTrack": "kurzick",
     "conciseDescription": "Spirits you control Shadow Step to your location and gain 60...100 Health."
   },
   {
