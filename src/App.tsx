@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Copy, Check, ArrowDownToLine } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { ArrowDownToLine, Swords } from 'lucide-react';
 import { Profession, Attribute, Campaign, TemplateData, Gw1Skill } from './data/types';
 import { generateBuild } from './core/generator/randomizer';
 import { GeneratedBuild } from './core/generator/types';
@@ -10,6 +10,7 @@ import { resolveTemplateSkills } from './data/skills';
 import { SkillBar } from './components/SkillBar';
 import { AttributePanel } from './components/AttributePanel';
 import { FilterPanel, SanityPreset } from './components/FilterPanel';
+import { TemplateCodeBar } from './components/TemplateCodeBar';
 import { CodeExportModal } from './components/CodeExportModal';
 
 const DEFAULT_CAMPAIGNS: Campaign[] = [
@@ -88,9 +89,12 @@ export default function App() {
   // Slot Lock State
   const [lockedSlots, setLockedSlots] = useState<Set<number>>(new Set());
 
+  // Roll Animation State
+  const [isRolling, setIsRolling] = useState(false);
+  const rollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Modal State
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
-  const [copiedQuick, setCopiedQuick] = useState(false);
 
   // Current Active Sanity Config
   const activeSanityConfig: SanityConfig =
@@ -112,8 +116,19 @@ export default function App() {
     })
   );
 
+  // Trigger Animation Helper
+  const triggerRollAnimation = useCallback(() => {
+    setIsRolling(true);
+    if (rollTimeoutRef.current) clearTimeout(rollTimeoutRef.current);
+    rollTimeoutRef.current = setTimeout(() => {
+      setIsRolling(false);
+    }, 300);
+  }, []);
+
   // Roll Build Action
   const rollBuild = useCallback(() => {
+    triggerRollAnimation();
+
     const lockedList = Array.from(lockedSlots)
       .filter(idx => idx >= 0 && idx < 8 && build.skills[idx])
       .map(idx => ({ index: idx, skillId: build.skills[idx].id }));
@@ -130,6 +145,7 @@ export default function App() {
 
     setBuild(newBuild);
   }, [
+    triggerRollAnimation,
     build.skills,
     lockedSlots,
     primaryProfession,
@@ -142,6 +158,8 @@ export default function App() {
 
   // Reroll single slot action
   const rerollSlot = (slotIdx: number) => {
+    triggerRollAnimation();
+
     const lockedList = build.skills
       .map((skill, index) => ({ index, skillId: skill.id }))
       .filter(item => item.index !== slotIdx);
@@ -162,7 +180,6 @@ export default function App() {
   // Keyboard shortcut listener (Space or 'R' to roll)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input, textarea, select, or focused on a button
       const target = e.target as HTMLElement;
       if (
         target.tagName === 'INPUT' ||
@@ -182,6 +199,13 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [rollBuild]);
+
+  // Clean up roll animation timeout
+  useEffect(() => {
+    return () => {
+      if (rollTimeoutRef.current) clearTimeout(rollTimeoutRef.current);
+    };
+  }, []);
 
   // Synchronize build template code with URL hash
   useEffect(() => {
@@ -243,7 +267,7 @@ export default function App() {
     );
 
     const totalUsed = updatedAllocations.reduce((sum, a) => sum + a.cost, 0);
-    if (totalUsed > MAX_ATTRIBUTE_POINTS) return; // Prevent exceeding budget
+    if (totalUsed > MAX_ATTRIBUTE_POINTS) return;
 
     const updatedTemplateData: TemplateData = {
       ...build.templateData,
@@ -264,18 +288,19 @@ export default function App() {
     }));
   };
 
-  // Quick Copy to Clipboard
-  const handleQuickCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(build.templateCode);
-      setCopiedQuick(true);
-      setTimeout(() => setCopiedQuick(false), 2000);
-    } catch {
-      // Fallback
+  // Apply pasted / input code directly
+  const handleApplyCode = (code: string): boolean => {
+    const parsed = buildFromTemplateCode(code);
+    if (parsed) {
+      setBuild(parsed);
+      setPrimaryProfession(parsed.primaryProfession);
+      setSecondaryProfession(parsed.secondaryProfession);
+      return true;
     }
+    return false;
   };
 
-  // Import build
+  // Import build from modal
   const handleImportBuild = (data: {
     templateData: TemplateData;
     skills: [Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill, Gw1Skill];
@@ -287,16 +312,16 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col justify-between selection:bg-amber-500 selection:text-stone-950">
-      {/* Top Navbar */}
-      <header className="border-b border-stone-800/80 bg-stone-900/60 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-lg shadow-sm">
-              ⚔
+    <div className="min-h-screen bg-[#0f1014] text-stone-100 flex flex-col justify-between selection:bg-amber-500 selection:text-stone-950">
+      {/* Top Navigation Bar - Matte Dark Stone */}
+      <header className="border-b border-stone-800 bg-[#14151b] sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-[#1c1e26] border border-stone-700 flex items-center justify-center text-amber-400 font-bold">
+              <Swords className="w-4 h-4 text-amber-400" />
             </div>
             <div>
-              <h1 className="font-bold text-base sm:text-lg text-amber-500 tracking-tight leading-none">
+              <h1 className="font-extrabold text-base sm:text-lg text-amber-400 tracking-tight leading-none">
                 GW1 Skill Randomizer
               </h1>
               <p className="text-[11px] text-stone-400 mt-0.5 hidden sm:block">
@@ -306,30 +331,13 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Quick Copy Code Button */}
-            <button
-              type="button"
-              onClick={handleQuickCopy}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
-                copiedQuick
-                  ? 'bg-emerald-600/90 border-emerald-500 text-white'
-                  : 'bg-stone-900 hover:bg-stone-800 border-stone-700 text-amber-400 hover:text-amber-300'
-              }`}
-            >
-              {copiedQuick ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-              <span className="font-mono">{build.templateCode.slice(0, 8)}...</span>
-              <span className="hidden md:inline font-sans text-stone-400 text-[10px]">
-                {copiedQuick ? 'Copied!' : 'Copy Code'}
-              </span>
-            </button>
-
             {/* Template Dialog Button */}
             <button
               type="button"
               onClick={() => setIsCodeModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-stone-100 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 hover:text-white transition-colors cursor-pointer active:scale-95"
             >
-              <ArrowDownToLine className="w-3.5 h-3.5" />
+              <ArrowDownToLine className="w-3.5 h-3.5 text-stone-400" />
               <span>Import / Export</span>
             </button>
           </div>
@@ -337,14 +345,15 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-6xl w-full mx-auto px-4 py-6 flex-1 flex flex-col gap-6">
-        {/* Skill Bar Section */}
+      <main className="max-w-6xl w-full mx-auto px-4 py-5 sm:py-6 flex-1 flex flex-col gap-5 sm:gap-6">
+        {/* Visual Skill Bar Section */}
         <section aria-label="Visual Skill Bar">
           <SkillBar
             skills={build.skills}
             lockedSlots={lockedSlots}
             primaryProfession={build.primaryProfession}
             secondaryProfession={build.secondaryProfession}
+            isRolling={isRolling}
             onToggleLock={toggleLock}
             onRerollSlot={rerollSlot}
             onLockAll={lockAll}
@@ -352,9 +361,18 @@ export default function App() {
           />
         </section>
 
+        {/* Prominent Build Code Asset Bar (Copy & Direct Paste / Edit) */}
+        <section aria-label="Build Code Bar">
+          <TemplateCodeBar
+            templateCode={build.templateCode}
+            onApplyCode={handleApplyCode}
+            onOpenModal={() => setIsCodeModalOpen(true)}
+          />
+        </section>
+
         {/* Lower Grid: Attributes & Generator Controls */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Attributes Panel (5 cols) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          {/* Attributes Panel (5 cols on desktop) */}
           <section className="lg:col-span-5" aria-label="Attributes">
             <AttributePanel
               allocations={build.attributeAllocations}
@@ -364,7 +382,7 @@ export default function App() {
             />
           </section>
 
-          {/* Configuration & Filter Panel (7 cols) */}
+          {/* Configuration & Filter Panel (7 cols on desktop) */}
           <section className="lg:col-span-7" aria-label="Generator Filters">
             <FilterPanel
               primaryProfession={primaryProfession}
@@ -374,6 +392,7 @@ export default function App() {
               lockedElite={lockedElite}
               sanityPreset={sanityPreset}
               sanityConfig={activeSanityConfig}
+              isRolling={isRolling}
               onPrimaryChange={setPrimaryProfession}
               onSecondaryChange={setSecondaryProfession}
               onToggleCampaign={toggleCampaign}
@@ -387,11 +406,11 @@ export default function App() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-stone-800/80 bg-stone-950 py-4 text-center text-xs text-stone-500">
+      {/* Footer - Matte Dark Stone */}
+      <footer className="border-t border-stone-800 bg-[#14151b] py-4 text-center text-xs text-stone-500">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p>© 2025 GW1 Skill Bar Randomizer. Free and open source fan project.</p>
-          <p className="text-[11px] text-stone-600">
+          <p className="text-[11px] text-stone-500">
             Guild Wars is a registered trademark of NCSoft Corporation.
           </p>
         </div>

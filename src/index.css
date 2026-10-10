@@ -3,3 +3,40 @@
 :root {
   color-scheme: dark;
 }
+
+/* Snappy, physical roll reveal without glossy bloom or blur */
+@keyframes slot-reveal {
+  0% {
+    transform: translateY(-4px) scale(0.97);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes dice-wobble {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-25deg) scale(1.05);
+  }
+  75% {
+    transform: rotate(385deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-slot-roll {
+  animation: slot-reveal 0.22s ease-out both;
+}
+
+.animate-dice-roll {
+  animation: dice-wobble 0.4s ease-in-out;
+}
+
+

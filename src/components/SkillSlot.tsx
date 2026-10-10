@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Lock, Unlock, RefreshCw } from 'lucide-react';
+import { Lock, Unlock, RefreshCw, Sparkles } from 'lucide-react';
 import { Gw1Skill } from '../data/types';
 import { SkillIcon } from './SkillIcon';
 import { SkillTooltip } from './SkillTooltip';
@@ -8,6 +8,7 @@ interface SkillSlotProps {
   slotIndex: number; // 0..7
   skill: Gw1Skill | null;
   isLocked: boolean;
+  isRolling?: boolean;
   onToggleLock: (index: number) => void;
   onRerollSlot: (index: number) => void;
 }
@@ -16,6 +17,7 @@ export function SkillSlot({
   slotIndex,
   skill,
   isLocked,
+  isRolling = false,
   onToggleLock,
   onRerollSlot,
 }: SkillSlotProps) {
@@ -23,6 +25,7 @@ export function SkillSlot({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const isElite = skill?.isElite ?? false;
+  const shouldAnimate = isRolling && !isLocked;
 
   return (
     <div
@@ -33,25 +36,41 @@ export function SkillSlot({
       onBlur={() => setIsHovered(false)}
       className="relative flex flex-col items-center group"
     >
-      {/* Skill Card Frame */}
+      {/* Skill Card Frame - Matte Obsidian / Gold Frame */}
       <div
         onClick={() => setIsHovered(prev => !prev)}
-        className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-md p-0.5 transition-all duration-150 shadow-md cursor-pointer ${
+        style={{
+          animationDelay: shouldAnimate ? `${slotIndex * 30}ms` : undefined,
+        }}
+        className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg p-0.5 transition-all select-none cursor-pointer ${
+          shouldAnimate ? 'animate-slot-roll' : ''
+        } ${
           isElite
-            ? 'bg-gradient-to-b from-amber-400 via-amber-600 to-amber-800 ring-2 ring-amber-400/90 shadow-amber-900/50'
-            : 'bg-stone-800 border border-stone-600/80 hover:border-stone-400'
-        } ${isLocked ? 'ring-2 ring-blue-500/80' : ''}`}
+            ? 'bg-[#221c10] border-2 border-amber-500'
+            : 'bg-[#181a20] border border-stone-700 hover:border-stone-500'
+        } ${
+          isLocked
+            ? 'ring-2 ring-sky-500 border-sky-500'
+            : 'hover:scale-[1.02]'
+        }`}
       >
-        <SkillIcon skill={skill} size={60} className="w-full h-full" />
+        <SkillIcon skill={skill} size={60} className="w-full h-full rounded-[5px]" />
+
+        {/* Elite Crown Indicator */}
+        {isElite && (
+          <div className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-amber-500 text-stone-950">
+            <Sparkles className="w-2.5 h-2.5 fill-stone-950" />
+          </div>
+        )}
 
         {/* Slot Number Badge */}
-        <span className="absolute bottom-0.5 right-1 text-[10px] font-mono font-bold text-stone-300 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.9)] select-none">
+        <span className="absolute bottom-0.5 right-1 text-[10px] font-mono font-bold text-stone-300 drop-shadow-[0_1px_2px_rgba(0,0,0,1)] select-none">
           {slotIndex + 1}
         </span>
 
         {/* Lock Overlay Badge if locked */}
         {isLocked && (
-          <div className="absolute top-0.5 left-0.5 p-0.5 rounded bg-blue-600/90 text-white shadow">
+          <div className="absolute top-0.5 left-0.5 p-1 rounded-md bg-sky-600 text-white select-none">
             <Lock className="w-2.5 h-2.5" />
           </div>
         )}
@@ -65,10 +84,10 @@ export function SkillSlot({
           onClick={() => onToggleLock(slotIndex)}
           title={isLocked ? 'Unlock slot' : 'Lock slot'}
           aria-label={isLocked ? `Unlock slot ${slotIndex + 1}` : `Lock slot ${slotIndex + 1}`}
-          className={`p-1 rounded text-xs transition-colors ${
+          className={`p-1 rounded text-xs transition-colors cursor-pointer ${
             isLocked
-              ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-sm'
-              : 'bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-stone-200'
+              ? 'bg-sky-600 hover:bg-sky-500 text-white'
+              : 'bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-stone-200 border border-stone-800'
           }`}
         >
           {isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
@@ -81,10 +100,10 @@ export function SkillSlot({
           disabled={isLocked}
           title={isLocked ? 'Slot is locked' : 'Reroll this slot'}
           aria-label={`Reroll slot ${slotIndex + 1}`}
-          className={`p-1 rounded text-xs transition-colors ${
+          className={`p-1 rounded text-xs transition-colors cursor-pointer ${
             isLocked
-              ? 'opacity-30 cursor-not-allowed text-stone-500'
-              : 'bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-amber-400'
+              ? 'opacity-25 cursor-not-allowed text-stone-600 bg-stone-900 border border-stone-800'
+              : 'bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-amber-400 border border-stone-800 active:scale-95'
           }`}
         >
           <RefreshCw className="w-3 h-3" />
@@ -94,7 +113,7 @@ export function SkillSlot({
       {/* Hover/Tap Tooltip Popup */}
       {isHovered && skill && (
         <div
-          className={`absolute bottom-full mb-2 z-50 pointer-events-none ${
+          className={`absolute bottom-full mb-2.5 z-50 pointer-events-none ${
             slotIndex <= 1
               ? 'left-0 translate-x-0'
               : slotIndex >= 6

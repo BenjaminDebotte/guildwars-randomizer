@@ -90,18 +90,18 @@ export function CodeExportModal({
       aria-labelledby="modal-title"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
     >
-      <div className="relative w-full max-w-lg bg-stone-900 border border-stone-700 rounded-xl shadow-2xl p-5 text-stone-200">
+      <div className="relative w-full max-w-lg bg-[#16171d] border border-stone-700 rounded-xl shadow-2xl p-5 text-stone-200">
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
           aria-label="Close template modal"
-          className="absolute top-4 right-4 p-1 rounded-lg text-stone-400 hover:text-stone-200 hover:bg-stone-800 transition-colors"
+          className="absolute top-4 right-4 p-1 rounded-lg text-stone-400 hover:text-white hover:bg-stone-800 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <h3 id="modal-title" className="text-lg font-bold text-amber-500 mb-1">
+        <h3 id="modal-title" className="text-lg font-bold text-amber-400 mb-1 tracking-tight">
           In-Game Template Code
         </h3>
         <p className="text-xs text-stone-400 mb-4">
@@ -110,7 +110,7 @@ export function CodeExportModal({
 
         {/* Export Box */}
         <div className="mb-5">
-          <label className="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-300 mb-1.5">
             Current Build Code
           </label>
           <div className="flex items-center gap-2">
@@ -119,12 +119,12 @@ export function CodeExportModal({
               readOnly
               value={templateCode}
               onClick={e => (e.target as HTMLInputElement).select()}
-              className="flex-1 bg-stone-950 border border-stone-800 rounded-lg p-2.5 font-mono text-sm text-amber-400 select-all focus:outline-none"
+              className="flex-1 bg-[#0f1014] border border-stone-800 rounded-lg p-2.5 font-mono text-sm text-amber-300 select-all focus:outline-none focus:border-amber-500"
             />
             <button
               type="button"
               onClick={handleCopy}
-              className={`flex items-center gap-1.5 px-3 py-2.5 rounded-lg font-semibold text-xs transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg font-bold text-xs transition-colors cursor-pointer active:scale-95 ${
                 copied
                   ? 'bg-emerald-600 text-white'
                   : 'bg-amber-600 hover:bg-amber-500 text-stone-950'
@@ -137,17 +137,17 @@ export function CodeExportModal({
               type="button"
               onClick={handleCopyLink}
               title="Copy direct link to build"
-              className={`flex items-center gap-1.5 px-3 py-2.5 rounded-lg font-semibold text-xs transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg font-semibold text-xs transition-colors cursor-pointer active:scale-95 ${
                 linkCopied
                   ? 'bg-emerald-600 text-white'
-                  : 'bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700'
+                  : 'bg-stone-900 hover:bg-stone-800 text-stone-200 border border-stone-700'
               }`}
             >
               {linkCopied ? <Check className="w-4 h-4" /> : <Link className="w-4 h-4" />}
               {linkCopied ? 'Link Copied' : 'Share Link'}
             </button>
           </div>
-          <p className="text-[11px] text-stone-500 mt-1.5">
+          <p className="text-[11px] text-stone-500 mt-2">
             Tip: In Guild Wars, open Skills (K) → Skills & Attributes template menu → Load from Template Code.
           </p>
         </div>
@@ -157,7 +157,7 @@ export function CodeExportModal({
 
         {/* Import Box */}
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">
+          <label className="block text-xs font-bold uppercase tracking-wider text-stone-300 mb-1.5">
             Import Build Code
           </label>
           <div className="flex items-center gap-2">
@@ -166,12 +166,12 @@ export function CodeExportModal({
               placeholder="Paste template code e.g. OwFj0xfzITOMMMHMie4O0kxZ6PA..."
               value={importInput}
               onChange={e => setImportInput(e.target.value)}
-              className="flex-1 bg-stone-950 border border-stone-800 rounded-lg p-2.5 font-mono text-xs text-stone-200 placeholder-stone-600 focus:outline-none focus:border-amber-500"
+              className="flex-1 bg-[#0f1014] border border-stone-800 rounded-lg p-2.5 font-mono text-xs text-stone-200 placeholder-stone-600 focus:outline-none focus:border-amber-500"
             />
             <button
               type="button"
               onClick={handleImport}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 font-semibold text-xs border border-stone-700 transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 font-semibold text-xs border border-stone-700 transition-colors cursor-pointer active:scale-95"
             >
               <ArrowDownToLine className="w-4 h-4" />
               Import
