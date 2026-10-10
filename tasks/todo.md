@@ -253,5 +253,9 @@
 
 ### Checkpoint: Complete Application
 - [x] `npm run build` succeeds cleanly
-- [x] `npm test` passes with 100% test success (38/38 tests)
+- [x] `npm test` passes with 100% test success (47/47 tests)
 - [x] End-to-end functionality verified: roll, lock, filter, copy code, import code
+- [x] Strongly-typed enums for all game-relative integer IDs (`Profession`, `Campaign`, `Attribute`, `TemplateType`)
+- [x] Shareable URL hash navigation and deep links (`#<TemplateCode>`)
+- [x] Relative asset base path configuration for GitHub Pages
+- [x] Automated GitHub Actions deployment pipeline (`.github/workflows/deploy.yml`)
