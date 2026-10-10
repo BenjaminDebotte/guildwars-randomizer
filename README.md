@@ -36,7 +36,7 @@ A high-performance, client-side web application for generating randomized Guild 
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22+ (Active LTS)
 - npm 10+
 
 ### Installation & Development
